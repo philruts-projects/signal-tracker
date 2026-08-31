@@ -1,9 +1,9 @@
 """
-tracker.py — Phase 3, step 2: poll the watchlist, store filings in SQLite,
-and report any NEW filings since the last run.
+tracker.py — Phase 4: poll the watchlist, store filings in SQLite, detect NEW
+filings, and generate a plain-English Claude briefing for each new one.
 
-First run for a company = baseline (record what's there now, no alerts).
-Later runs = only genuinely new filings are reported as events.
+Safety: at most MAX_BRIEFINGS_PER_RUN briefings are generated per run, so a
+surge of new filings can never run up a surprise API bill.
 """
 
 import os
@@ -15,6 +15,8 @@ from datetime import datetime, timezone
 import requests
 from dotenv import load_dotenv
 
+from briefing import generate_briefing
+
 load_dotenv()
 API_KEY = os.getenv("CH_API_KEY")
 if not API_KEY:
@@ -22,6 +24,7 @@ if not API_KEY:
 
 BASE_URL = "https://api.company-information.service.gov.uk"
 DB_FILE = "data/signals.db"
+MAX_BRIEFINGS_PER_RUN = 5     # hard cap on Claude calls per run
 
 
 def ch_get(path):
@@ -36,8 +39,7 @@ def read_watchlist(filename="watchlist.csv"):
 
 
 def setup_database():
-    """Create the database file and tables if they don't already exist."""
-    os.makedirs("data", exist_ok=True)   # make the data/ folder if missing
+    os.makedirs("data", exist_ok=True)
     conn = sqlite3.connect(DB_FILE)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS companies (
@@ -53,7 +55,8 @@ def setup_database():
             type           TEXT,
             category       TEXT,
             description    TEXT,
-            first_seen     TEXT
+            first_seen     TEXT,
+            briefing       TEXT
         )
     """)
     conn.commit()
@@ -61,21 +64,19 @@ def setup_database():
 
 
 def process_company(conn, company):
+    """Fetch a company's filings, store any new ones, return the new filings."""
     number = company["company_number"].strip()
     name = company["company_name"].strip()
 
-    # Remember the company itself
     conn.execute(
         "INSERT OR REPLACE INTO companies (company_number, company_name) VALUES (?, ?)",
         (number, name),
     )
 
-    # Have we seen this company before?
     already_stored = conn.execute(
         "SELECT COUNT(*) FROM filings WHERE company_number = ?", (number,)
     ).fetchone()[0]
 
-    # Fetch the most recent filings (a page of up to 100)
     data = ch_get(f"/company/{number}/filing-history?items_per_page=100")
     filings = data.get("items", [])
 
@@ -88,35 +89,62 @@ def process_company(conn, company):
         seen = conn.execute(
             "SELECT 1 FROM filings WHERE transaction_id = ?", (tid,)
         ).fetchone()
-        if seen is None:                      # not in the database = new to us
+        if seen is None:
             conn.execute(
                 """INSERT INTO filings
-                   (transaction_id, company_number, date, type, category, description, first_seen)
-                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                   (transaction_id, company_number, date, type, category, description, first_seen, briefing)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, NULL)""",
                 (tid, number, f.get("date"), f.get("type"),
                  f.get("category"), f.get("description"), now),
             )
             new_filings.append(f)
 
     conn.commit()
-
-    # Report
-    if already_stored == 0:
-        print(f"{name} ({number}) — baseline recorded: {len(new_filings)} filings")
-    elif new_filings:
-        print(f"{name} ({number}) — {len(new_filings)} NEW filing(s):")
-        for f in new_filings:
-            print(f"    {f.get('date')}  {f.get('type')}  {f.get('description')}")
-    else:
-        print(f"{name} ({number}) — no new filings")
+    return name, number, already_stored, new_filings
 
 
 def main():
     conn = setup_database()
     watchlist = read_watchlist()
     print(f"Polling {len(watchlist)} companies...\n")
+
+    briefings_left = MAX_BRIEFINGS_PER_RUN
+
     for company in watchlist:
-        process_company(conn, company)
+        name, number, already_stored, new_filings = process_company(conn, company)
+
+        if already_stored == 0:
+            print(f"{name} ({number}) — baseline recorded: {len(new_filings)} filings\n")
+            continue
+
+        if not new_filings:
+            print(f"{name} ({number}) — no new filings\n")
+            continue
+
+        print(f"{name} ({number}) — {len(new_filings)} NEW filing(s):")
+        for f in new_filings:
+            print(f"    {f.get('date')}  {f.get('type')}  {f.get('description')}")
+
+            if briefings_left > 0:
+                brief_input = {
+                    "company_name": name,
+                    "company_number": number,
+                    "date": f.get("date"),
+                    "type": f.get("type"),
+                    "category": f.get("category"),
+                    "description": f.get("description"),
+                }
+                text = generate_briefing(brief_input)
+                conn.execute(
+                    "UPDATE filings SET briefing = ? WHERE transaction_id = ?",
+                    (text, f.get("transaction_id")),
+                )
+                conn.commit()
+                briefings_left -= 1
+                print("\n" + text + "\n")
+            else:
+                print("    (briefing skipped — per-run cap reached)\n")
+
     conn.close()
 
 
