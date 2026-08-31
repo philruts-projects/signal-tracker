@@ -20,6 +20,49 @@ enrichment. Any new data source must earn its place by making a briefing more
 | Credit agencies (Creditsafe, Experian, D&B) | Commercial-grade risk scores | Paid | The "what incumbents charge for" comparison. |
 | News (NewsAPI, GDELT) | M&A, leadership exits, layoffs | Free/paid | Noisy; adds context to a filing. |
 
+## Companies House — richer data we already touch or can reach (same free API/key)
+
+Discovered while reviewing the stored data. Highest value first.
+
+- **Capture `description_values` (do this early).** The API returns a `description_values`
+  object on each filing (e.g. `officer_name`, `termination_date`, share amounts) that we
+  currently discard — we only store the `description` code. Capturing it enables (a) a
+  deterministic human-readable label via Companies House's own template file, and (b) far
+  more specific briefings (name the actual director/date instead of "a director").
+- **Readable-description lookup.** `description` codes are keys into Companies House's
+  published enumeration `filing_history_descriptions.yml` (repo: `companieshouse/api-enumerations`),
+  which maps e.g. `termination-director-company-with-name-termination-date` →
+  "Termination of appointment of {officer_name} as a director on {termination_date}".
+  `constants.yml` in the same repo lists `category` values. Vendor these as a local lookup,
+  with a prettify fallback for codes not in the file (some SH/CS codes aren't).
+- **Company profile** (`/company/{number}`): `company_status` (active/dissolved/liquidation/
+  administration), `has_insolvency_history`, `has_charges`, accounts-overdue flags, `sic_codes`,
+  `previous_company_names`. For a credit/risk audience this is arguably higher-value than
+  filing history — genuine distress shows up here.
+- **Charges** (`/charges`): secured lending / mortgages — direct credit signal.
+- **Insolvency** (`/insolvency`), **Officers** (`/officers`), **PSC**
+  (`/persons-with-significant-control`, ownership).
+- Other discarded filing fields: `action_date`, `subcategory`, `links` (to the actual
+  filing document via the Document API), `pages`, `paper_filed`.
+
+## Known limitations / failure modes (for the Phase 6 write-up)
+
+- **Uneven look-back window.** We fetch the latest 100 filings per company
+  (`items_per_page=100`), so time-depth varies by how often a company files — ~3 months for
+  a heavy filer (L&G), years for a light one (Admiral). A company filing >100 documents
+  between two polls would overflow the window; in practice this never happens at any sane
+  polling cadence, so the risk is near-zero — but it's a deliberate trade-off worth stating.
+  Chosen because change detection only needs the recent page (new filings arrive at the top).
+
+## Data-model notes (learned, keep in mind)
+
+- Every company has a permanent unique 8-char **company number**; names are not unique over
+  time and can change (see `previous_company_names`). **Always key on number, never name.**
+  Subsidiaries are separate entities with their own numbers (Aviva plc `02468686` vs Aviva
+  Insurance Ltd `SC002116`).
+- Source-of-truth fields (from the API): `transaction_id`, `type`, `category`, `date`,
+  `description`. Derived-by-us: `first_seen`, `briefing`.
+
 ## Also parked
 
 - Product-journey / user-flow mapping — revisit once the slice reveals the real UX questions.

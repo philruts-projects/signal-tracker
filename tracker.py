@@ -9,6 +9,7 @@ surge of new filings can never run up a surprise API bill.
 import os
 import csv
 import sys
+import json
 import sqlite3
 from datetime import datetime, timezone
 
@@ -49,14 +50,15 @@ def setup_database():
     """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS filings (
-            transaction_id TEXT PRIMARY KEY,
-            company_number TEXT,
-            date           TEXT,
-            type           TEXT,
-            category       TEXT,
-            description    TEXT,
-            first_seen     TEXT,
-            briefing       TEXT
+            transaction_id     TEXT PRIMARY KEY,
+            company_number     TEXT,
+            date               TEXT,
+            type               TEXT,
+            category           TEXT,
+            description        TEXT,
+            description_values TEXT,
+            first_seen         TEXT,
+            briefing           TEXT
         )
     """)
     conn.commit()
@@ -90,12 +92,16 @@ def process_company(conn, company):
             "SELECT 1 FROM filings WHERE transaction_id = ?", (tid,)
         ).fetchone()
         if seen is None:
+            # Keep the officer names / dates / share figures the API gives us,
+            # stored as JSON text so we can use them later.
+            values_json = json.dumps(f.get("description_values") or {})
             conn.execute(
                 """INSERT INTO filings
-                   (transaction_id, company_number, date, type, category, description, first_seen, briefing)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, NULL)""",
-                (tid, number, f.get("date"), f.get("type"),
-                 f.get("category"), f.get("description"), now),
+                   (transaction_id, company_number, date, type, category,
+                    description, description_values, first_seen, briefing)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)""",
+                (tid, number, f.get("date"), f.get("type"), f.get("category"),
+                 f.get("description"), values_json, now),
             )
             new_filings.append(f)
 
@@ -133,6 +139,7 @@ def main():
                     "type": f.get("type"),
                     "category": f.get("category"),
                     "description": f.get("description"),
+                    "description_values": f.get("description_values") or {},
                 }
                 text = generate_briefing(brief_input)
                 conn.execute(
