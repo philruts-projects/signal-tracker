@@ -12,7 +12,7 @@ monitoring manually.
 - [x] Phase 1 — Stakeholder brief (problem framing)
 - [x] Phase 2 — Repo, API key, first working API call  ← *in progress*
 - [x] Phase 3 — Data layer (poll API, detect new filings, store in SQLite)
-- [ ] Phase 4 — Claude layer (generate plain-English briefings)
+- [x] Phase 4 — Claude layer (generate plain-English briefings)
 - [ ] Phase 5 — Streamlit UI
 - [ ] Phase 6 — Evaluation (accuracy and failure modes)
 - [ ] Phase 7 — README, LinkedIn post, Loom walkthrough
