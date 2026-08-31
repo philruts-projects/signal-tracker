@@ -17,6 +17,7 @@ import requests
 from dotenv import load_dotenv
 
 from briefing import generate_briefing
+from severity import rule_severity
 
 load_dotenv()
 API_KEY = os.getenv("CH_API_KEY")
@@ -44,8 +45,13 @@ def setup_database():
     conn = sqlite3.connect(DB_FILE)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS companies (
-            company_number TEXT PRIMARY KEY,
-            company_name   TEXT
+            company_number         TEXT PRIMARY KEY,
+            company_name           TEXT,
+            status                 TEXT,
+            status_detail          TEXT,
+            has_insolvency_history INTEGER,
+            has_charges            INTEGER,
+            accounts_overdue       INTEGER
         )
     """)
     conn.execute("""
@@ -57,6 +63,7 @@ def setup_database():
             category           TEXT,
             description        TEXT,
             description_values TEXT,
+            severity           TEXT,
             first_seen         TEXT,
             briefing           TEXT
         )
@@ -70,9 +77,23 @@ def process_company(conn, company):
     number = company["company_number"].strip()
     name = company["company_name"].strip()
 
+    # Pull the company profile for its registered status — the strongest single signal.
+    try:
+        profile = ch_get(f"/company/{number}")
+    except Exception:
+        profile = {}
+    status = profile.get("company_status")
+    status_detail = profile.get("company_status_detail")
+    has_insolvency = 1 if profile.get("has_insolvency_history") else 0
+    has_charges = 1 if profile.get("has_charges") else 0
+    accounts_overdue = 1 if (profile.get("accounts") or {}).get("overdue") else 0
+
     conn.execute(
-        "INSERT OR REPLACE INTO companies (company_number, company_name) VALUES (?, ?)",
-        (number, name),
+        """INSERT OR REPLACE INTO companies
+           (company_number, company_name, status, status_detail,
+            has_insolvency_history, has_charges, accounts_overdue)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (number, name, status, status_detail, has_insolvency, has_charges, accounts_overdue),
     )
 
     already_stored = conn.execute(
@@ -95,13 +116,21 @@ def process_company(conn, company):
             # Keep the officer names / dates / share figures the API gives us,
             # stored as JSON text so we can use them later.
             values_json = json.dumps(f.get("description_values") or {})
+            # Rules-based risk verdict, computed once and stored.
+            f["severity"] = rule_severity({
+                "company_name": name,
+                "type": f.get("type"),
+                "category": f.get("category"),
+                "description": f.get("description"),
+                "description_values": f.get("description_values") or {},
+            })
             conn.execute(
                 """INSERT INTO filings
                    (transaction_id, company_number, date, type, category,
-                    description, description_values, first_seen, briefing)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)""",
+                    description, description_values, severity, first_seen, briefing)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)""",
                 (tid, number, f.get("date"), f.get("type"), f.get("category"),
-                 f.get("description"), values_json, now),
+                 f.get("description"), values_json, f["severity"], now),
             )
             new_filings.append(f)
 
@@ -129,7 +158,7 @@ def main():
 
         print(f"{name} ({number}) — {len(new_filings)} NEW filing(s):")
         for f in new_filings:
-            print(f"    {f.get('date')}  {f.get('type')}  {f.get('description')}")
+            print(f"    [{f.get('severity')}]  {f.get('date')}  {f.get('type')}  {f.get('description')}")
 
             if briefings_left > 0:
                 brief_input = {
@@ -140,6 +169,7 @@ def main():
                     "category": f.get("category"),
                     "description": f.get("description"),
                     "description_values": f.get("description_values") or {},
+                    "severity": f.get("severity"),
                 }
                 text = generate_briefing(brief_input)
                 conn.execute(
