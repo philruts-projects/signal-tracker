@@ -63,6 +63,33 @@ Discovered while reviewing the stored data. Highest value first.
 - Source-of-truth fields (from the API): `transaction_id`, `type`, `category`, `date`,
   `description`. Derived-by-us: `first_seen`, `briefing`.
 
+## Signal heuristics & the pattern-detection gap (from domain review)
+
+The current tool briefs filings **one at a time**. Real distress is a **cluster**, not a
+single filing — the biggest limitation and the clearest next feature. Evidence from the
+data (all filings the tracker would have caught):
+
+- **Carillion (collapsed Jan 2018):** CFO out (Jan '17), CEO out (Jul '17), replacement CFO
+  gone within 8 months, then 5 new charges in one week (Oct '17). The *cluster* is the signal.
+- **LC&F (collapsed Jan 2019):** accounting reference date changed 3× in 15 months. One change
+  is routine; the *repetition* is the tell — invisible to a single-filing view.
+- **Greensill (collapsed Mar 2021):** secured charges through 2020 + governance churn.
+
+Heuristics to encode later (severity is contextual — build rules from these):
+- **Founder / named-founder departure → always elevate.** Rarely quiet; often trails a PE deal,
+  funding round, or strategy/performance rupture.
+- **Finance-leadership churn (CFO exit, short-tenured replacement) → elevate.** Revolving-door
+  finance is a classic pre-failure marker.
+- **Cluster of new charges in a short window → elevate.** Scrambling for secured finance.
+- **Repeated accounting-reference-date changes → elevate.** Obfuscation / delaying accounts.
+- **Capital events (allotment/cancellation) → threshold rule**, e.g. flag if the figure is
+  material vs revenue / market cap; otherwise inform-only. Briefings should also *explain the
+  mechanism* (what a share cancellation is and why firms do it).
+
+Framing: **the value is early warning.** Aftermath filings (liquidation disclaimers,
+administration progress reports) are post-mortem — correctly labelling them is near-worthless.
+The eval is built around the run-up, not the collapse.
+
 ## Also parked
 
 - Product-journey / user-flow mapping — revisit once the slice reveals the real UX questions.

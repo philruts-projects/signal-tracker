@@ -50,6 +50,17 @@ def build_user_prompt(f):
     )
 
 
+def extract_text(message):
+    """Return the text of the first text block, skipping any reasoning/thinking blocks."""
+    for block in message.content:
+        if getattr(block, "type", None) == "text":
+            return block.text
+    for block in message.content:          # fallback
+        if hasattr(block, "text"):
+            return block.text
+    return ""
+
+
 def generate_briefing(f):
     client = anthropic.Anthropic()
     message = client.messages.create(
@@ -58,4 +69,4 @@ def generate_briefing(f):
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": build_user_prompt(f)}],
     )
-    return message.content[0].text
+    return extract_text(message)
