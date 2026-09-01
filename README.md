@@ -5,7 +5,7 @@ warning signs were usually sitting on the Companies House register for months be
 free to read, and nobody was watching. This watches them for you.
 
 Signal Tracker monitors a watchlist of UK companies, picks out the filings that matter,
-scores how worried you should be, and writes a plain-English briefing on each one. It's
+flags how much attention each company needs, and writes a plain-English briefing on each one. It's
 built for the credit, account-management and supplier-risk teams who do this by hand today,
 when they do it at all.
 
@@ -23,16 +23,22 @@ You give it a watchlist (a list of company numbers in `watchlist.csv`). On each 
 2. Works out which filings are new since it last looked, by keeping a record in a local
    SQLite database and comparing against it. Nothing gets flagged twice.
 3. Puts a risk verdict on each new filing (Routine, Watch, Serious, Critical) using
-   explainable rules that encode a few hard-won heuristics: a founder leaving elevates the
-   flag, a new charge means fresh secured borrowing, anything insolvency-related is Serious
-   or Critical.
+   explainable rules that encode a few hard-won heuristics: a likely-founder departure elevates
+   the flag, a registered charge is a secured-borrowing signal, anything insolvency-related is
+   Serious or Critical. Cross-filing patterns escalate too — a burst of charges or a repeated
+   accounting-date change reads as Serious, because distress is a cluster, not one filing.
 4. Sends the genuinely new filings to the Claude API, which turns a code like
    `TM01 termination-director` into a short briefing: what happened, why it matters, what to
    do. There's a hard cap on briefings per run so a surge of filings can't run up a bill.
 
 The dashboard (`app.py`) then leads with risk: your companies ranked worst-first, each with
-its registered status up top and the signals and briefings a click below. Healthy companies
-stay quiet at the bottom. If nothing needs you, it says so.
+its registered status up top, its filing-level signals folded in (so a Serious filing lifts the
+headline, not just the sort order), and the briefings a click below. A company whose latest data
+fetch failed shows as *Unknown* rather than being assumed healthy. Healthy companies stay quiet
+at the bottom. If nothing needs you, it says so.
+
+Risk here is a *review priority* — how much attention a company warrants — not a probability of
+insolvency.
 
 ## How well does it work
 
@@ -42,10 +48,11 @@ and calibrated against a human analyst. The short version:
 
 - Reliable at the extremes. Routine filings stay calm, genuine crises get the right alarm and
   sensible actions. Zero hallucinations across 24 briefings.
-- Weak in the valuable middle. It under-flags the subtle early warnings, because it reads each
-  filing on its own and can't see that a departing director was the *finance* chief, or that a
-  charge is one of five that week. Real distress is a cluster, and single-filing briefing can't
-  see clusters. That's the headline finding and the case for the next build.
+- Weak in the valuable middle. Its remaining blind spot is a departing director's *role*:
+  Companies House holds no executive title, so it can't tell a finance chief's exit from any
+  other. It now *does* detect clusters in the verdict — a burst of charges, repeated
+  accounting-date changes read as Serious — though the written briefing still describes one
+  filing at a time. Role-blindness is the genuine data ceiling and the case for the next build.
 - Haiku is good enough. It matched Sonnet on risk calls at a third of the cost, so Haiku is the
   default.
 
