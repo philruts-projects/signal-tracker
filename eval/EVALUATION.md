@@ -14,15 +14,24 @@ plus the key facts a briefing must get right) set by a commercial data leader.
 ## Eval 1 — the verdict (deterministic)
 
 `eval_verdict.py` runs the rules over the test set and compares each verdict to ground truth.
-No model, no cost, same answer every run.
+No model, no cost, same answer every run. It reads a committed fixture
+(`eval/eval_fixtures.json`), so it reproduces from a clean clone with no private database and
+no API key.
 
-**Accuracy: 10/12.** Full detail in [verdict_results.md](verdict_results.md).
+**10/12 curated cases match ground truth.** Full detail in [verdict_results.md](verdict_results.md).
+This is a regression suite — proof the rules still behave as intended — not a population
+accuracy figure; the cases are hand-picked and the labels are the builder's.
 
 Every routine filing is called correctly, Aviva's large buyback lands at Watch, Greensill's
 founder departure and its administration are right, and the two pattern fixes hold: Carillion's
 charge reads Serious because the rules see it's one of a cluster of five in a week, and London
-Capital & Finance's accounting-date change reads Serious because the rules see it's the third in
-fifteen months. Pattern detection moved this from 9 to 10.
+Capital & Finance's accounting-date change reads Serious because the rules see it's a repeat
+change — the rule elevates on the *second* accounting-reference-date change within eighteen
+months (an explicit, tested threshold), and LC&F changed it three times. Pattern detection
+moved this from 9 to 10.
+
+The cross-filing rules are point-in-time safe: they only count filings dated on or before the
+one being scored, so a historical verdict is never helped by a filing that hadn't happened yet.
 
 The two misses are both Carillion director exits, the finance director and the CEO, which the
 rules call Routine. There is no fix for these in the data: Companies House holds no executive
@@ -65,3 +74,10 @@ them directly. Keep widening the cross-filing patterns. Bring in the sources tha
 Gazette for the earliest formal notices — since the churn work taught us distress is a confluence,
 not any single signal. Keep Haiku. And re-run both evals after each change: the verdict eval is
 free and instant, so there's no excuse not to.
+
+**Update (after the external review).** Several reliability and integrity gaps the review found
+are now fixed: company-level risk reflects filing severity (a Serious filing raises the
+headline, not just the sort order); failed API fetches read as *Unknown*, not a reassuring
+Routine; this suite runs from committed fixtures and is point-in-time safe; and the
+accounting-date threshold is explicit and tested. Full record in
+[`docs/review-response.md`](../docs/review-response.md).

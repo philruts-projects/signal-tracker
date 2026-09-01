@@ -1,6 +1,8 @@
-# Verdict evaluation (deterministic rules)
+# Verdict regression suite (deterministic rules)
 
-Accuracy: **10/12**. No model, no cost, reproducible.
+**10/12** curated cases match the analyst's ground truth. No model, no cost, no private database — runs from `eval/eval_fixtures.json`.
+
+This is a regression check that the rules still behave as intended, not a population accuracy figure. See [EVALUATION.md](EVALUATION.md).
 
 | Company | Type | Expected | Verdict | Match |
 |---|---|---|---|---|
