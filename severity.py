@@ -11,9 +11,18 @@ and we can't see that a charge is one of a cluster (needs cross-filing pattern d
 Those cases sit in the roadmap.
 """
 
+from datetime import datetime
+
 _ORDER = {"Routine": 0, "Watch": 1, "Serious": 2, "Critical": 3}
 
 CAPITAL_WATCH_THRESHOLD = 500_000_000  # GBP; crude size cue pending a %-of-revenue rule
+
+
+def _date(value):
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return None
 
 
 def _is_founder(company_name, officer_name):
@@ -74,6 +83,53 @@ def rule_severity(f):
         return "Watch" if _largest_capital_figure(vals) >= CAPITAL_WATCH_THRESHOLD else "Routine"
 
     return "Routine"
+
+
+def _is_charge_create(o):
+    t = (o.get("type") or "").upper()
+    d = (o.get("description") or "").lower()
+    return ((o.get("category") or "").lower() == "mortgage" or t.startswith("MR")) and "satisf" not in d
+
+
+def _is_ard_change(o):
+    return (o.get("type") or "").upper() == "AA01" or "reference-date" in (o.get("description") or "").lower()
+
+
+def pattern_severity(f, company_filings):
+    """Elevate based on cross-filing patterns within the same company.
+
+    Only the distress-leaning patterns: a cluster of new charges, or a repeated
+    accounting-reference-date change. Board churn is deliberately excluded — it's
+    ambiguous (see company_risk).
+    """
+    fdate = _date(f.get("date"))
+    if fdate is None:
+        return "Routine"
+
+    # A burst of new charges: 3+ within a 30-day window around this one.
+    if _is_charge_create(f):
+        near = sum(1 for o in company_filings
+                   if _is_charge_create(o) and _date(o.get("date"))
+                   and abs((_date(o.get("date")) - fdate).days) <= 30)
+        if near >= 3:
+            return "Serious"
+
+    # Repeated accounting-reference-date changes: this one plus 1+ others in ~18 months.
+    if _is_ard_change(f):
+        prior = sum(1 for o in company_filings
+                    if _is_ard_change(o) and _date(o.get("date"))
+                    and 0 <= (fdate - _date(o.get("date"))).days <= 18 * 30)
+        if prior >= 2:
+            return "Serious"
+
+    return "Routine"
+
+
+def combined_severity(f, company_filings):
+    """Single-filing rule severity, escalated by any cross-filing pattern."""
+    base = rule_severity(f)
+    patt = pattern_severity(f, company_filings)
+    return base if _ORDER[base] >= _ORDER[patt] else patt
 
 
 def company_risk(status, has_insolvency_history=False, accounts_overdue=False, recent_churn=0):

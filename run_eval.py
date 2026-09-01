@@ -56,14 +56,14 @@ def add_cost(model, usage):
 def load_filing(conn, tid):
     row = conn.execute(
         """SELECT c.company_name, c.company_number, f.date, f.type, f.category,
-                  f.description, f.description_values
+                  f.description, f.description_values, f.severity
            FROM filings f JOIN companies c ON c.company_number = f.company_number
            WHERE f.transaction_id = ?""",
         (tid,),
     ).fetchone()
     if not row:
         return None
-    name, num, date, typ, cat, desc, vals = row
+    name, num, date, typ, cat, desc, vals, severity = row
     return {
         "company_name": name,
         "company_number": num,
@@ -72,6 +72,7 @@ def load_filing(conn, tid):
         "category": cat,
         "description": desc,
         "description_values": json.loads(vals) if vals else {},
+        "severity": severity,
     }
 
 

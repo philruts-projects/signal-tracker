@@ -17,8 +17,9 @@ import requests
 from dotenv import load_dotenv
 
 from briefing import generate_briefing
-from severity import rule_severity
+from severity import combined_severity
 from officers import compute_churn
+from charges import summarize_charges
 
 load_dotenv()
 API_KEY = os.getenv("CH_API_KEY")
@@ -56,7 +57,11 @@ def setup_database():
             peak_churn             INTEGER,
             peak_churn_date        TEXT,
             recent_churn           INTEGER,
-            short_tenure_exits     INTEGER
+            short_tenure_exits     INTEGER,
+            charges_total          INTEGER,
+            charges_outstanding    INTEGER,
+            charges_recent         INTEGER,
+            charges_json           TEXT
         )
     """)
     conn.execute("""
@@ -100,15 +105,25 @@ def process_company(conn, company):
     except Exception:
         churn = {"peak_churn": 0, "peak_churn_date": None, "recent_churn": 0, "short_tenure_exits": 0}
 
+    # Secured borrowing from the charges list.
+    try:
+        charge_items = ch_get(f"/company/{number}/charges?items_per_page=100").get("items", [])
+        ch = summarize_charges(charge_items)
+    except Exception:
+        ch = {"charges_total": 0, "charges_outstanding": 0, "charges_recent": 0, "charges_rows": []}
+
     conn.execute(
         """INSERT OR REPLACE INTO companies
            (company_number, company_name, status, status_detail,
             has_insolvency_history, has_charges, accounts_overdue,
-            peak_churn, peak_churn_date, recent_churn, short_tenure_exits)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            peak_churn, peak_churn_date, recent_churn, short_tenure_exits,
+            charges_total, charges_outstanding, charges_recent, charges_json)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (number, name, status, status_detail, has_insolvency, has_charges, accounts_overdue,
          churn["peak_churn"], churn["peak_churn_date"], churn["recent_churn"],
-         churn["short_tenure_exits"]),
+         churn["short_tenure_exits"],
+         ch["charges_total"], ch["charges_outstanding"], ch["charges_recent"],
+         json.dumps(ch["charges_rows"])),
     )
 
     already_stored = conn.execute(
@@ -131,14 +146,16 @@ def process_company(conn, company):
             # Keep the officer names / dates / share figures the API gives us,
             # stored as JSON text so we can use them later.
             values_json = json.dumps(f.get("description_values") or {})
-            # Rules-based risk verdict, computed once and stored.
-            f["severity"] = rule_severity({
+            # Rules-based risk verdict, escalated by cross-filing patterns. `filings`
+            # is the company's full recent list, so clusters are visible here.
+            f["severity"] = combined_severity({
                 "company_name": name,
+                "date": f.get("date"),
                 "type": f.get("type"),
                 "category": f.get("category"),
                 "description": f.get("description"),
                 "description_values": f.get("description_values") or {},
-            })
+            }, filings)
             conn.execute(
                 """INSERT INTO filings
                    (transaction_id, company_number, date, type, category,

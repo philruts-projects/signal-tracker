@@ -8,6 +8,7 @@ Read-only over the SQLite database. No API calls.
 Run it with:  streamlit run app.py
 """
 
+import json
 import sqlite3
 import pandas as pd
 import streamlit as st
@@ -71,6 +72,8 @@ for _, co in companies.iterrows():
         "peak_churn": int(co.get("peak_churn") or 0),
         "peak_churn_date": co.get("peak_churn_date"),
         "short_tenure_exits": int(co.get("short_tenure_exits") or 0),
+        "charges_outstanding": int(co.get("charges_outstanding") or 0),
+        "charges_rows": json.loads(co["charges_json"]) if co.get("charges_json") else [],
     })
 
 posture = pd.DataFrame(rows)
@@ -113,6 +116,12 @@ for _, co in view.iterrows():
         if co["peak_churn"] >= 3 and co["risk"] in ("Watch", "Serious", "Critical"):
             when = f" (to {co['peak_churn_date']})" if co["peak_churn_date"] else ""
             st.caption(f"Board churn: {co['peak_churn']} director resignations within 90 days{when}")
+        # Secured borrowing — corroboration on already-flagged companies, with the lender named.
+        if co["charges_outstanding"] and co["risk"] in ("Watch", "Serious", "Critical"):
+            outstanding = [r for r in co["charges_rows"] if r.get("status") in ("outstanding", "part-satisfied")]
+            latest = outstanding[0] if outstanding else None
+            extra = f", latest to {latest['lender']} ({latest['created_on']})" if latest and latest.get("lender") else ""
+            st.caption(f"Secured borrowing: {co['charges_outstanding']} charge(s) outstanding{extra}")
 
         mine = filings[filings["company_number"] == co["company_number"]]
         notable = mine[mine["severity"].isin(["Watch", "Serious", "Critical"])].sort_values("date", ascending=False)
