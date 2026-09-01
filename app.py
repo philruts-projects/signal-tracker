@@ -49,7 +49,8 @@ companies, filings = load_data()
 # --- Per-company risk posture -------------------------------------------------
 rows = []
 for _, co in companies.iterrows():
-    risk = company_risk(co.get("status"), co.get("has_insolvency_history"), co.get("accounts_overdue"))
+    risk = company_risk(co.get("status"), co.get("has_insolvency_history"),
+                        co.get("accounts_overdue"), co.get("recent_churn"))
     mine = filings[filings["company_number"] == co["company_number"]]
     notable = mine[mine["severity"].isin(["Watch", "Serious", "Critical"])]
     crit = int((mine["severity"] == "Critical").sum())
@@ -67,6 +68,9 @@ for _, co in companies.iterrows():
         "crit": crit,
         "ser": ser,
         "latest": latest_txt,
+        "peak_churn": int(co.get("peak_churn") or 0),
+        "peak_churn_date": co.get("peak_churn_date"),
+        "short_tenure_exits": int(co.get("short_tenure_exits") or 0),
     })
 
 posture = pd.DataFrame(rows)
@@ -105,6 +109,10 @@ for _, co in view.iterrows():
         st.markdown("  ·  ".join(bits))
         if co["latest"]:
             st.caption(f"Latest signal: {co['latest']}")
+        # Churn is corroboration, not a standalone flag — only show it on already-flagged companies.
+        if co["peak_churn"] >= 3 and co["risk"] in ("Watch", "Serious", "Critical"):
+            when = f" (to {co['peak_churn_date']})" if co["peak_churn_date"] else ""
+            st.caption(f"Board churn: {co['peak_churn']} director resignations within 90 days{when}")
 
         mine = filings[filings["company_number"] == co["company_number"]]
         notable = mine[mine["severity"].isin(["Watch", "Serious", "Critical"])].sort_values("date", ascending=False)

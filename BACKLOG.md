@@ -86,6 +86,15 @@ Heuristics to encode later (severity is contextual — build rules from these):
   material vs revenue / market cap; otherwise inform-only. Briefings should also *explain the
   mechanism* (what a share cancellation is and why firms do it).
 
+Board churn is a corroborator, not a trigger (learned the hard way). Testing the
+officers endpoint showed Direct Line — a healthy insurer — with the highest board churn
+on the watchlist (12 resignations in 90 days to mid-2025), because Aviva was acquiring it.
+Carillion, which actually collapsed, showed almost no cluster. Mass resignations mean
+acquisition or a board refresh at least as often as distress, so churn only counts when
+other stress is present (charges, overdue accounts, insolvency history). The wider lesson:
+distress is a *confluence* of signals, not any single dimension. Officer occupation is empty
+at Companies House, so executive roles (CFO/CEO) can't be read from the data at all.
+
 Framing: **the value is early warning.** Aftermath filings (liquidation disclaimers,
 administration progress reports) are post-mortem — correctly labelling them is near-worthless.
 The eval is built around the run-up, not the collapse.

@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 
 from briefing import generate_briefing
 from severity import rule_severity
+from officers import compute_churn
 
 load_dotenv()
 API_KEY = os.getenv("CH_API_KEY")
@@ -51,7 +52,11 @@ def setup_database():
             status_detail          TEXT,
             has_insolvency_history INTEGER,
             has_charges            INTEGER,
-            accounts_overdue       INTEGER
+            accounts_overdue       INTEGER,
+            peak_churn             INTEGER,
+            peak_churn_date        TEXT,
+            recent_churn           INTEGER,
+            short_tenure_exits     INTEGER
         )
     """)
     conn.execute("""
@@ -88,12 +93,22 @@ def process_company(conn, company):
     has_charges = 1 if profile.get("has_charges") else 0
     accounts_overdue = 1 if (profile.get("accounts") or {}).get("overdue") else 0
 
+    # Board churn and tenure from the officers list.
+    try:
+        officers = ch_get(f"/company/{number}/officers?items_per_page=100").get("items", [])
+        churn = compute_churn(officers)
+    except Exception:
+        churn = {"peak_churn": 0, "peak_churn_date": None, "recent_churn": 0, "short_tenure_exits": 0}
+
     conn.execute(
         """INSERT OR REPLACE INTO companies
            (company_number, company_name, status, status_detail,
-            has_insolvency_history, has_charges, accounts_overdue)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
-        (number, name, status, status_detail, has_insolvency, has_charges, accounts_overdue),
+            has_insolvency_history, has_charges, accounts_overdue,
+            peak_churn, peak_churn_date, recent_churn, short_tenure_exits)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (number, name, status, status_detail, has_insolvency, has_charges, accounts_overdue,
+         churn["peak_churn"], churn["peak_churn_date"], churn["recent_churn"],
+         churn["short_tenure_exits"]),
     )
 
     already_stored = conn.execute(

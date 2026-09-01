@@ -76,7 +76,7 @@ def rule_severity(f):
     return "Routine"
 
 
-def company_risk(status, has_insolvency_history=False, accounts_overdue=False):
+def company_risk(status, has_insolvency_history=False, accounts_overdue=False, recent_churn=0):
     """Company-level risk from its registered status — the strongest single signal."""
     s = (status or "").lower()
     if any(k in s for k in
@@ -84,8 +84,12 @@ def company_risk(status, has_insolvency_history=False, accounts_overdue=False):
         return "Critical"
     if "dissolved" in s or "removed" in s or "converted-closed" in s:
         return "Serious"
-    if accounts_overdue:            # active but not filing accounts on time
+    if accounts_overdue:                 # active but not filing accounts on time
         return "Serious"
-    if has_insolvency_history:      # active, but has been in trouble before
+    # Board churn is a corroborator, not a trigger: mass resignations can just mean an
+    # acquisition or a board refresh. Only elevate when other stress is present too.
+    if recent_churn and recent_churn >= 3 and (has_insolvency_history or accounts_overdue):
+        return "Serious"
+    if has_insolvency_history:            # active, but has been in trouble before
         return "Watch"
     return "Routine"
