@@ -1,5 +1,5 @@
 {
-  "total_cost_usd": 0.2985,
+  "total_cost_usd": 0.2981,
   "results": [
     {
       "case": {
@@ -25,29 +25,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nJane Elizabeth Adamson stepped down as a director of Direct Line Insurance Group plc on 31 July 2026.\n\n**Why it matters:**\nDirector changes are routine corporate housekeeping when departures are orderly and announced without controversy. This filing simply signals that Adamson's directorship has ended; the lack of surrounding detail suggests a standard transition rather than a departure under difficult circumstances.\n\n**Suggested action:**\nCheck the company's latest annual report or RNS announcements if you need to understand the context of her departure or identify her replacement.",
+          "briefing": "Risk: Routine\nWhat happened: Jane Elizabeth Adamson stepped down as a director on 31 July 2026.\nWhy it matters: Director changes are normal business events. This termination carries no inherent signal of distress\u2014turnover happens regularly in large listed groups due to retirement, role changes or internal reorganisation.\nSuggested action: Confirm whether a replacement has been appointed and note any change in board composition or governance structure if material to your exposure.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 4,
-            "action_usefulness": 4,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": true,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
             "overall": 4,
-            "comment": "Accurate, correctly routine framing with a sensible follow-up check, though the inference that absence of detail implies an amicable exit is mildly speculative and it omits the insurer's scale/financial health as reassuring context."
+            "comment": "Accurate and clearly written, correctly framing a single director exit at a large insurer as routine, though the action step is fairly generic and 'stepped down' slightly overstates what a TM01 discloses about the reason."
           }
         },
         "sonnet": {
-          "briefing": "**What happened:** Direct Line Insurance Group plc filed a TM01 notice confirming that Jane Elizabeth Adamson ceased to be a director of the company, effective 31 July 2026.\n\n**Why it matters:** Director departures are routinely filed and, on their own, are a normal part of board turnover rather than a sign of operational or financial distress; the assessed severity here is Routine, indicating no immediate cause for concern based on this filing alone.\n\n**Suggested action:** No immediate action required, but note the change and check Direct Line's next investor or governance announcement for context on board composition.",
+          "briefing": "Risk: Routine\n\nWhat happened: Direct Line Insurance Group plc filed a TM01 confirming the termination of Jane Elizabeth Adamson as a director, effective 31 July 2026.\n\nWhy it matters: Director changes at this level are a normal part of corporate governance and board turnover, and a single departure filing carries no inherent commercial risk signal on its own.\n\nSuggested action: Note the change for your records; no immediate action is required unless combined with other adverse signals from this company.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 5,
-            "action_usefulness": 4,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": true,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
-            "overall": 5,
-            "comment": "Accurate, correctly framed as routine board turnover with sensible low-urgency follow-up, though the action advice is somewhat generic and the self-referential mention of the severity label is slightly awkward."
+            "overall": 4,
+            "comment": "Accurate and clearly written with sensible context, though it could add value by noting the director's role and advising a watch for clustered board departures."
           }
         }
       }
@@ -76,23 +72,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nEmma Alley was appointed as a director of Marshmallow Financial Services Ltd on 3 August 2026.\n\n**Why it matters:**\nThis is a routine leadership change. Marshmallow Financial Services is a UK-regulated financial services company, so director appointments are standard governance updates that Companies House records. The appointment was effective over a week before public filing, indicating normal administrative processing.\n\n**Suggested action:**\nNo action needed unless you hold existing credit or service arrangements with Marshmallow that require you to update your records of company officers.",
+          "briefing": "Risk: Routine\n\nWhat happened: Ms Emma Alley was appointed as a director of Marshmallow Financial Services Ltd on 3 August 2026.\n\nWhy it matters: Director appointments are a normal part of business operations and governance. This is a standard staffing change with no immediate commercial concern.\n\nSuggested action: Update your internal records and continue standard monitoring of the company's filings.",
           "scores": {
-            "error": "could not parse judge output: Expecting value: line 1 column 1 (char 0)",
-            "raw": "{\"factual_accuracy\":4,\"interpretation\":4,\"action_usefulness\":4,\"assigned_severity\":\"Routine\",\"severity_matches_expected\":true,\"hallucination\":false,\"overall\":4,\"comment\":\"Accurate and correctly framed as routine governance, though the 'UK-regulated' claim is a mild unverified inference and the growth-stage InsurTech context is omitted"
+            "factual_accuracy": 5,
+            "usefulness": 3,
+            "clarity": 5,
+            "hallucination": false,
+            "overall": 4,
+            "comment": "Accurate and clearly written, but the analysis is generic boilerplate that adds no company-specific context (e.g. board build-out at a growth-stage insurer) beyond restating the filing."
           }
         },
         "sonnet": {
-          "briefing": "**What happened:** Marshmallow Financial Services Ltd filed notice of the appointment of Ms Emma Alley as a director, effective 3 August 2026.\n\n**Why it matters:** Routine director appointments are a normal part of corporate governance and do not typically signal financial distress or operational change; this is standard board maintenance activity.\n\n**Suggested action:** No immediate action required, though credit/account teams may wish to note the update in their records and check for any related pattern of officer changes over time.",
+          "briefing": "Risk: Routine\n\nWhat happened: Marshmallow Financial Services Ltd appointed Ms Emma Alley as a director, effective 3 August 2026.\n\nWhy it matters: Director appointments are a normal part of company governance and do not, on their own, indicate any change in financial health or trading status; this is a routine administrative update to the company's officer record.\n\nSuggested action: Note the new director on file for future reference; no immediate action is required.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 4,
-            "action_usefulness": 3,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": true,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
             "overall": 4,
-            "comment": "Accurate and correctly pitched as routine, though it misses company context (growth-stage InsurTech, potential positive signal) and the suggested action is generic."
+            "comment": "Accurate, clearly written and correctly framed as routine, though the action step is generic and it misses context such as the company's growth-stage profile or board composition."
           }
         }
       }
@@ -120,29 +118,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nAdmiral Group plc has filed interim financial accounts for the six-month period ending 30 June 2026.\n\n**Why it matters:**\nInterim accounts are routine filing obligations for listed companies and provide a mid-year snapshot of financial performance. This filing confirms the company is meeting its reporting requirements and allows stakeholders to monitor trading performance before the full-year accounts.\n\n**Suggested action:**\nReview the interim results to assess any changes in profitability, underwriting performance, or cash position since the last full-year filing.",
+          "briefing": "Risk: Routine\n\nWhat happened: Admiral Group plc filed interim accounts for the six-month period ending 30 June 2026.\n\nWhy it matters: This is a standard regulatory filing showing the company's financial position halfway through the financial year. Interim accounts are a normal part of listed company disclosure and allow stakeholders to monitor performance in the current trading period.\n\nSuggested action: Review the interim results against your credit, account and procurement parameters; no follow-up needed unless the financial position has changed materially since your last review.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 4,
-            "action_usefulness": 4,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": true,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
             "overall": 4,
-            "comment": "Accurate, appropriately low-key summary of a routine interim filing with a sensible if generic review action."
+            "comment": "Accurate and clearly written summary of the interim accounts filing, though the suggested action is somewhat generic boilerplate."
           }
         },
         "sonnet": {
-          "briefing": "**What happened:** Admiral Group plc filed interim (half-year) accounts with Companies House for the period made up to 30 June 2026.\n\n**Why it matters:** This is a routine, expected filing for a listed group reporting interim financial results and carries no inherent negative signal; it confirms the company is meeting its normal statutory reporting obligations on schedule.\n\n**Suggested action:** No action required beyond noting the filing is up to date; review the accounts only if you need updated financial figures for credit or commercial risk assessment.",
+          "briefing": "Risk: Routine\nWhat happened: Admiral Group plc filed interim annual accounts made up to 30 June 2026, a standard periodic filing with Companies House.\nWhy it matters: This is a routine statutory filing reflecting normal reporting activity and does not itself indicate any change in financial health or business risk.\nSuggested action: No action needed beyond noting the filing on file; review the accounts if updated financial detail is required for ongoing credit or commercial assessment.",
           "scores": {
-            "factual_accuracy": 5,
-            "interpretation": 5,
-            "action_usefulness": 4,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": true,
+            "factual_accuracy": 4,
+            "usefulness": 4,
+            "clarity": 4,
             "hallucination": false,
-            "overall": 5,
-            "comment": "Accurate, appropriately low-urgency summary of a routine interim accounts filing with sensible if generic guidance."
+            "overall": 4,
+            "comment": "Accurate and clear routine-filing summary with sensible next steps, though 'interim annual accounts' is a self-contradictory phrasing and the note adds little beyond the filing itself."
           }
         }
       }
@@ -170,29 +164,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "# Extracover Ltd (Zego) \u2014 Confirmation Statement Filing\n\n**What happened:**\nThe company filed its routine annual confirmation statement on 21 June 2026, confirming its registered details as at 12 June 2026.\n\n**Why it matters:**\nConfirmation statements are a standard annual filing requirement and indicate the company remains active and compliant with Companies House obligations. This filing carries no warning signals.\n\n**Suggested action:**\nNo action required unless you are reviewing this company for other reasons; proceed with normal monitoring.",
+          "briefing": "Risk: Routine\n\nWhat happened: Extracover Ltd filed a confirmation statement on 21 June 2026 with updates to company information, covering the period to 12 June 2026.\n\nWhy it matters: This is the standard annual filing that all active UK companies must make to keep their Companies House record current. It confirms the company remains operational and its core details (directors, shareholders, registered address) are up to date.\n\nSuggested action: No action required unless you have specific questions about the updates disclosed in the filing.",
           "scores": {
-            "factual_accuracy": 4,
-            "interpretation": 4,
-            "action_usefulness": 4,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": true,
+            "factual_accuracy": 5,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
             "overall": 4,
-            "comment": "Accurate and correctly routine, though it omits that this was a confirmation statement 'with updates', which could warrant a quick check of what changed."
+            "comment": "Accurate, clearly written summary of a routine confirmation statement with correct dates and a sensible no-action recommendation, though it could note that the 'with updates' variant may warrant a quick check of what changed."
           }
         },
         "sonnet": {
-          "briefing": "**What happened:** Extracover Ltd (trading as Zego) filed its annual confirmation statement dated 12 June 2026, confirming its company details are up to date, with some information updated as part of this filing.\n\n**Why it matters:** This is a routine statutory filing that all UK companies must submit annually; the \"with updates\" flag simply means minor details (such as officer, address, or shareholder information) were amended, which is normal and does not itself signal financial distress or operational change.\n\n**Suggested action:** No immediate action required, but if you hold an active commercial relationship with Zego, it may be worth a quick check of the full filing on Companies House to see exactly which details were updated.",
+          "briefing": "Risk: Routine\n\nWhat happened: Extracover Ltd (Zego) filed its annual confirmation statement, made up to 12 June 2026, confirming that company details on record have been reviewed and include some updates.\n\nWhy it matters: This is a standard statutory filing that all UK companies must submit annually to confirm details such as directors, registered office and shareholders are current; the presence of \"updates\" simply means minor changes were noted, not a sign of financial or operational distress.\n\nSuggested action: Note the filing on file and review the specific updates (e.g. via the linked filings) only if your due diligence process requires confirmation of unchanged counterparty details.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 5,
-            "action_usefulness": 4,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": true,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
             "overall": 5,
-            "comment": "Accurate, correctly framed as routine, with a sensible low-effort follow-up suggestion."
+            "comment": "Accurate, clearly written summary that correctly frames the confirmation statement as routine and gives a proportionate, actionable next step."
           }
         }
       }
@@ -226,23 +216,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened**\nLegal & General Group plc allotted new shares worth approximately \u00a3138m on 13 August 2026.\n\n**Why it matters**\nShare allotments typically signal either a capital raise, employee share scheme activity, or settlement of corporate transactions. This figure is material but the filing doesn't specify the purpose, so the commercial context\u2014whether this reflects organic growth funding, acquisition-related payments, or routine equity compensation\u2014remains unclear from this notification alone.\n\n**Suggested action**\nCheck the company's regulatory news service announcements or upcoming annual report narrative for detail on the allotment's purpose and whether it materially dilutes existing shareholders.",
+          "briefing": "Risk: Routine\n\nWhat happened: Legal & General Group plc allotted new shares worth \u00a3138.1m on 13 August 2026.\n\nWhy it matters: Share allotments are a normal part of corporate operations, typically used for employee schemes, acquisitions or capital management. This filing signals the company executed a planned capital action but carries no inherent concern.\n\nSuggested action: No immediate action required; monitor for related filings that might clarify the purpose (such as regulatory announcements or updated shareholder registers).",
           "scores": {
-            "error": "could not parse judge output: Expecting value: line 1 column 1 (char 0)",
-            "raw": ""
+            "factual_accuracy": 4,
+            "usefulness": 4,
+            "clarity": 5,
+            "hallucination": false,
+            "overall": 4,
+            "comment": "Accurate, clearly written summary matching the filing's ~\u00a3138m allotment and date, with sensibly hedged context, though the stated purpose remains generic and the figure is presented as new shares issued rather than a statement of capital."
           }
         },
         "sonnet": {
-          "briefing": "**What happened:** Legal & General Group plc filed an SH01 return notifying Companies House of a share allotment dated 13 August 2026, with an associated capital figure of approximately \u00a3138.07 million.\n\n**Why it matters:** Share allotments are a routine corporate action for a large listed group like L&G and can relate to a variety of ordinary business activities (e.g. employee share schemes, capital management, or scrip dividends); on its own, this filing does not indicate financial distress or a change in trading relationship.\n\n**Suggested action:** No immediate action needed \u2014 log the filing for the record and continue standard periodic monitoring of the company's filings.",
+          "briefing": "Risk: Routine\n\nWhat happened: Legal & General Group plc filed an SH01 notifying Companies House of a new allotment of shares, with share capital recorded at \u00a3138,072,807.475, dated 13 August 2026.\n\nWhy it matters: Share allotments are a normal corporate action (e.g. employee scheme issuance, small capital raises, or reorganisations) and this filing alone does not indicate financial distress or a change in control; it simply confirms an increase or adjustment to issued capital.\n\nSuggested action: No immediate action needed beyond noting the updated capital position on file; review the next confirmation statement or annual accounts if more context on the purpose of the allotment is required.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 5,
-            "action_usefulness": 4,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": true,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
             "overall": 5,
-            "comment": "Accurate, appropriately hedged summary of a routine SH01 with correctly calibrated low-urgency framing and sensible no-action guidance."
+            "comment": "Accurate, clearly written and appropriately hedged, with sensible next steps; examples of allotment purposes are flagged as possibilities rather than asserted facts."
           }
         }
       }
@@ -276,23 +268,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nAviva plc cancelled shares worth approximately \u00a3987.3 million on 14 July 2026.\n\n**Why it matters:**\nShare cancellation typically follows a buyback programme and reduces the total number of shares in issue. This is a routine capital management action that can signal management confidence in the business, though it also reduces the equity base. The large value suggests a material reduction in Aviva's share count.\n\n**Suggested action:**\nConfirm whether this relates to a previously announced buyback programme and note the impact on share dilution metrics used in your credit or covenant assessments.",
+          "briefing": "Risk: Watch\n\nWhat happened: Aviva plc cancelled just under \u00a3987.3m of its own shares on 14 July 2026.\n\nWhy it matters: Share cancellations are routine capital management \u2014 the company is reducing its share capital after a buyback programme. This is a normal housekeeping step that doesn't signal financial distress, but it does mean fewer shares are in issue, which affects earnings per share calculations and ownership percentages for existing shareholders.\n\nSuggested action: No immediate concern, but note the effective share count for any financial ratio analysis you're running on the company.",
           "scores": {
-            "error": "could not parse judge output: Expecting value: line 1 column 1 (char 0)",
-            "raw": ""
+            "factual_accuracy": 5,
+            "usefulness": 4,
+            "clarity": 5,
+            "hallucination": false,
+            "overall": 4,
+            "comment": "Accurate, clearly written summary that correctly explains the cancellation mechanism and its share-count implications, though the action step is thin and omits cross-checking against other filings or exposure factors."
           }
         },
         "sonnet": {
-          "briefing": "**What happened:** Aviva plc filed an SH06 notice confirming the cancellation of shares with an aggregate nominal value of \u00a3987,319,303.62, effective 14 July 2026.\n\n**Why it matters:** This is consistent with a routine share buyback and capital reduction exercise, which large listed companies like Aviva undertake periodically to return capital to shareholders; it does not typically indicate financial distress, but it does reduce the company's issued share capital base, which counterparties may wish to note for reference.\n\n**Suggested action:** No immediate action required \u2014 log this as a standard",
+          "briefing": "Risk: Watch\n\nWhat happened: Aviva plc filed an SH06 confirming the cancellation of shares, with capital movements referencing a value of \u00a3987,319,303.62, effective from 14 July 2026.\n\nWhy it matters: Share cancellations are a routine part of capital management (e.g. buybacks or restructuring of share classes) and don't inherently signal financial distress, but any change of this scale to issued capital is worth noting for its effect on shareholder structure and reported equity base.\n\nSuggested action: Note the filing on file and check Aviva's next confirmation statement or annual accounts to confirm the resulting share capital position, but no immediate commercial action is required.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 3,
-            "action_usefulness": 2,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": false,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
-            "overall": 3,
-            "comment": "Facts and figures are accurate and the buyback mechanism is correctly explained, but the briefing downplays the scale (~\u00a3987m) to Routine rather than Watch, omits any prompt to cross-check other exposures, and the action line is truncated mid-sentence."
+            "overall": 4,
+            "comment": "Accurate, well-hedged summary that explains what a share cancellation means and gives a sensible follow-up step, though it could note the buyback context and cross-check against other Aviva signals more explicitly."
           }
         }
       }
@@ -321,23 +315,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "# Companies House Filing Briefing\n\n**Company:** London Capital & Finance plc | **Date filed:** 17 October 2018\n\n---\n\n**What happened:**\nThe company changed its accounting reference date from 26 April to 27 April 2018 \u2014 a one-day shift marked as a shortened accounting period.\n\n**Why it matters:**\nA one-day change to the accounting reference date is unusual and typically signals administrative correction rather than a commercial restructuring. The \"shortened period\" designation suggests this may have been a correction to align records with actual year-end practice. On its own, this is a technical adjustment with no direct bearing on financial health, though the narrow margin warrants checking whether this reflects broader accounting or compliance issues.\n\n**Suggested action:**\nRequest the company's most recent accounts (filed after this change) to confirm the new reporting cycle is being followed consistently and to verify there are no underlying compliance concerns.",
+          "briefing": "Risk: Serious\n\nWhat happened: London Capital & Finance plc changed its accounting reference date from 27 April 2018 to 26 April 2018 \u2014 a one-day shift \u2014 and filed this change on 17 October 2018, six months after the date it claims to have made the change.\n\nWhy it matters: A one-day accounting reference date change is unusual and suggests potential irregularities in financial period management. The six-month delay between the stated change date and the actual filing creates a significant gap that warrants investigation, as it may indicate financial reporting issues, internal control problems, or attempts to manage reporting timelines in ways that obscure the company's true financial position.\n\nSuggested action: Contact the company directly to clarify the rationale for this change and request recent audited accounts and explanations of any reporting delays.",
           "scores": {
-            "error": "could not parse judge output: Expecting value: line 1 column 1 (char 0)",
-            "raw": ""
+            "factual_accuracy": 2,
+            "usefulness": 3,
+            "clarity": 4,
+            "hallucination": true,
+            "overall": 2,
+            "comment": "Clearly written but misreads the made-up date as the date the change was decided and misses the crucial pattern of repeated accounting reference date changes."
           }
         },
         "sonnet": {
-          "briefing": "What happened: London Capital & Finance plc filed a change to its accounting reference date, shortening its financial year end from 27 April to 26 April 2018.\n\nWhy it matters: On its face this is a one-day technical adjustment, but changes to the accounting reference date can sometimes signal an",
+          "briefing": "Risk: Serious\nWhat happened: London Capital & Finance plc changed its accounting reference date, shortening its period so the year now ends on 26 April 2018 instead of 27 April 2018.\nWhy it matters: Shortening an accounting reference period, especially when it follows a prior shortening, can be used to delay statutory filing deadlines or adjust reporting periods around other events, and warrants closer scrutiny of the company's filing pattern and financial reporting timeline.\nSuggested action: Cross-check this filing against the company's upcoming accounts due date and any other recent filings to confirm whether reporting deadlines are being deferred, and flag for review before extending or renewing credit terms.",
           "scores": {
             "factual_accuracy": 4,
-            "interpretation": 2,
-            "action_usefulness": 1,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": false,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
-            "overall": 2,
-            "comment": "Dates are stated correctly but the briefing is truncated, downplays the change as a one-day technicality, and misses the critical pattern of repeated ARD changes shortly before administration."
+            "overall": 4,
+            "comment": "Accurate on the dates and rightly flags the repeat shortening pattern, though it understates the history by not noting this is the third change in roughly 15 months."
           }
         }
       }
@@ -366,29 +362,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nRichard John Adam stepped down as a director of Carillion plc on 31 December 2016.\n\n**Why it matters:**\nDirector changes are routine in most cases, but this filing alone doesn't signal whether the departure was planned or problematic. Given Carillion's subsequent collapse in 2018, this historical filing reflects the company's operating period, but the departure itself carries no inherent warning sign without additional context around the circumstances or other board changes at the same time.\n\n**Suggested action:**\nCross-reference this filing with any concurrent board announcements or other director changes from late 2016 to assess whether the departure was part of planned succession or a wider governance shift.",
+          "briefing": "Risk: Routine\n\nWhat happened: Richard John Adam stepped down as a director of Carillion plc on 31 December 2016.\n\nWhy it matters: Director changes are a normal part of business operations and this filing simply records a departure. A single director leaving does not by itself signal financial or operational concern.\n\nSuggested action: Check the company's board composition and any regulatory news to understand whether this was a planned transition or part of wider management changes.",
           "scores": {
-            "factual_accuracy": 3,
-            "interpretation": 2,
-            "action_usefulness": 2,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": false,
+            "factual_accuracy": 4,
+            "usefulness": 2,
+            "clarity": 4,
             "hallucination": false,
             "overall": 2,
-            "comment": "Correctly states the name and date but fails to identify Adam as Finance Director and dismisses the departure as unremarkable, materially understating the risk signal."
+            "comment": "Accurate on the bare filing facts and clearly written, but it omits that Adam was the finance director and frames the departure as routine, stripping the briefing of the analytical value a credit team needs."
           }
         },
         "sonnet": {
-          "briefing": "What happened: Carillion plc filed a TM01 notice confirming the termination of director Richard John Adam, effective 31 December 2016.\n\nWhy it matters: Board-level departures are routine filings, but given Richard Adam's long tenure as Carillion's Finance Director, this signals a leadership change in a key financial oversight role worth noting for context in future filings or credit assessments.\n\nSuggested action: Check subsequent filings for a replacement finance director appointment and monitor for any related commentary in the company's next annual report or announcements.",
+          "briefing": "Risk: Routine\n\nWhat happened: Carillion plc filed a TM01 confirming that Richard John Adam ceased to be a director of the company effective 31 December 2016.\n\nWhy it matters: Director departures are a normal part of corporate governance and are routinely filed with Companies House; on its own, this filing does not indicate financial distress or operational disruption.\n\nSuggested action: Note the change in your records and check the company's next confirmation statement or annual accounts to confirm the board composition remains stable.",
           "scores": {
-            "factual_accuracy": 5,
-            "interpretation": 3,
-            "action_usefulness": 3,
-            "assigned_severity": "Watch",
-            "severity_matches_expected": false,
+            "factual_accuracy": 3,
+            "usefulness": 2,
+            "clarity": 4,
             "hallucination": false,
-            "overall": 3,
-            "comment": "Accurate and correctly identifies Adam's finance director role, but frames the CFO exit as routine context rather than a serious red flag at an already strained contractor, and the suggested action is passive monitoring rather than escalation."
+            "overall": 2,
+            "comment": "Filing details are stated correctly and the prose is clear, but it omits that Adam was the finance director and asserts without support that the departure signals nothing, yielding a generic and unhelpful action."
           }
         }
       }
@@ -417,29 +409,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nRichard John Howson stepped down as a director of Carillion plc on 10 July 2017.\n\n**Why it matters:**\nDirector departures are routine changes in board composition, though this particular departure occurred during a period when Carillion faced significant financial and operational pressures (the company entered administration in January 2018). At the time of filing, this move would not have flagged immediate concern on its own, but it forms part of the broader context of leadership changes the company experienced in 2017.\n\n**Suggested action:**\nCross-reference this departure with other board changes and financial performance data from mid-2017 to establish whether it was routine succession planning or part of a wider pattern of instability.",
+          "briefing": "Risk: Routine\nWhat happened: Richard John Howson ceased to be a director of Carillion plc on 10 July 2017.\nWhy it matters: Director changes are a normal part of company operations. This filing simply records the departure and has no inherent commercial significance on its own.\nSuggested action: Check the company's updated director list to confirm continuity of leadership and identify any replacement appointments.",
           "scores": {
             "factual_accuracy": 3,
-            "interpretation": 2,
-            "action_usefulness": 3,
-            "assigned_severity": "Watch",
-            "severity_matches_expected": false,
+            "usefulness": 2,
+            "clarity": 4,
             "hallucination": false,
             "overall": 2,
-            "comment": "Correct name and date but fails to identify Howson as CEO and frames a critical leadership exit six months before collapse as largely routine, understating severity."
+            "comment": "Accurately states the name and date but fails to identify Howson as CEO and wrongly frames a top-level leadership exit as commercially insignificant, leaving the reader under-informed despite clear prose."
           }
         },
         "sonnet": {
-          "briefing": "What happened: Carillion plc filed a TM01 confirming that Richard John Howson ceased to be a director of the company, effective 10 July 2017.\n\nWhy it matters: A single director termination is a routine administrative filing and does not, by itself, indicate distress; however, board changes at a",
+          "briefing": "Risk: Routine\n\nWhat happened: Carillion plc filed a TM01 notice confirming the termination of Richard John Howson as a director, effective 10 July 2017.\n\nWhy it matters: Director departures are recorded routinely at Companies House and, on their own, are a normal part of corporate governance; this filing alone does not indicate financial distress or operational disruption.\n\nSuggested action: Note the change in the company's director register and check subsequent filings or public announcements for context on the departure and any successor appointment.",
           "scores": {
             "factual_accuracy": 4,
-            "interpretation": 2,
-            "action_usefulness": 1,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": false,
+            "usefulness": 2,
+            "clarity": 4,
             "hallucination": false,
             "overall": 2,
-            "comment": "Filing details are accurate but the briefing misses that Howson was the CEO, wrongly frames the exit as routine administration, and cuts off mid-sentence without any recommended action."
+            "comment": "Accurately states the filing details and reads clearly, but fails to identify Howson as CEO or convey the significance of a top-leadership exit, and its framing as 'routine' with generic follow-up actions leaves the reader under-informed."
           }
         }
       }
@@ -468,29 +456,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nCarillion plc registered a mortgage charge on 26 October 2017, creating a secured loan arrangement (charge number 037823790002).\n\n**Why it matters:**\nThis signals the company has taken on new secured debt. While mortgage charges are routine, the timing and context matter: Carillion was facing serious liquidity and contract performance issues in 2017, and new secured borrowing typically indicates lenders are tightening terms or the company needs cash urgently. This adds to creditor hierarchy risk if the company's position deteriorates further.\n\n**Suggested action:**\nReview recent trading updates and cash flow statements to establish why this borrowing was needed, and check whether other secured lenders have priority claims over the same assets.",
+          "briefing": "Risk: Serious\n\nWhat happened: Carillion plc registered a mortgage charge on 26 October 2017, securing borrowing against company assets.\n\nWhy it matters: A new secured charge signals the company is relying on asset-backed lending, which typically indicates tightening liquidity or difficulty accessing unsecured funding. Given the scale of Carillion's operations, this move warrants close attention to covenant compliance and the lender's terms, as enforcement could materially disrupt the business.\n\nSuggested action: Obtain details of the charge amount, lender identity and security scope from the full deed filing, and monitor for additional charges or repayment pressures in forthcoming accounts.",
           "scores": {
-            "factual_accuracy": 5,
-            "interpretation": 4,
-            "action_usefulness": 4,
-            "assigned_severity": "Serious",
-            "severity_matches_expected": true,
+            "factual_accuracy": 4,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
             "overall": 4,
-            "comment": "Accurate and appropriately urgent, correctly framing new secured borrowing as a distress signal, though it misses the aggravating pattern of five charges registered in a single week."
+            "comment": "Accurate and clearly written with sensible follow-up actions, though it omits the charge number and the wider cluster of near-simultaneous charge registrations that sharpens the distress signal."
           }
         },
         "sonnet": {
-          "briefing": "What happened: Carillion plc registered a new charge (deed, charge number 037823790002) with Companies House on 27 October 2017, securing borrowing created the previous day, 26 October 2017.\n\nWhy it matters: The creation of a new secured charge indicates the company has pledged assets against a debt obligation, which can signal increased reliance on secured funding or lender-imposed conditions on existing facilities; the \"Serious\" severity flag suggests this may be part of a wider pattern of financial strain, though the filing alone does not specify the lender, amount, or assets secured.\n\nSuggested action: Request s",
+          "briefing": "Risk: Serious\nWhat happened: Carillion plc registered a new charge (charge number 037823790002) on 26 October 2017, securing borrowing against company assets via a deed.\nWhy it matters: New secured charges signal fresh lending typically tied to increased borrowing needs or lender-imposed security requirements, which can indicate tightening liquidity or heightened creditor caution about repayment risk; this is a material event worth tracking alongside any other recent filings or news.\nSuggested action: Review Carillion's full charge register and recent filing history for related patterns (e.g., multiple charges, satisfactions, or credit notices), and consider requesting updated financial assurances or payment terms review before extending further credit or exposure.",
           "scores": {
-            "factual_accuracy": 4,
-            "interpretation": 3,
-            "action_usefulness": 1,
-            "assigned_severity": "Serious",
-            "severity_matches_expected": true,
+            "factual_accuracy": 5,
+            "usefulness": 4,
+            "clarity": 4,
             "hallucination": false,
-            "overall": 2,
-            "comment": "Accurate on the filing facts and correctly Serious, but it misses the cluster of five charges and proximity to collapse, awkwardly cites its own severity flag, and the recommended action is cut off mid-sentence."
+            "overall": 4,
+            "comment": "Accurate and well-reasoned with sound actions, though it misses the wider cluster/distress context and the 'why it matters' sentence is overlong."
           }
         }
       }
@@ -519,29 +503,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nAlexander David Greensill stepped down as a director of Greensill Capital (UK) Ltd on 17 June 2026, with the termination filed at Companies House on 25 June 2026.\n\n**Why it matters:**\nThe departure of a founder or senior director can signal strategic change, internal dispute, or operational restructuring. Given the company name and timing, this warrants prompt clarification on whether this reflects planned succession, a change in the company's operating model, or other material developments affecting its governance and credit profile.\n\n**Suggested action:**\nContact the company to understand the reason for the director's departure and whether this affects credit terms, operational continuity, or the company's financial trajectory.",
+          "briefing": "Risk: Serious\nWhat happened: Alexander David Greensill stepped down as a director of Greensill Capital (UK) Ltd on 17 June 2026.\nWhy it matters: The departure of a founder or namesake director from a company bearing his name signals a material change in leadership and control. This is commercially significant as it may indicate shifts in strategy, ownership, or the company's operational direction, and warrants clarification on succession and continuity of management.\nSuggested action: Contact the company to confirm the reason for departure, identify the replacement director(s), and assess any impact on credit terms, account management or contract continuity.",
           "scores": {
-            "factual_accuracy": 5,
-            "interpretation": 4,
-            "action_usefulness": 4,
-            "assigned_severity": "Serious",
-            "severity_matches_expected": true,
+            "factual_accuracy": 4,
+            "usefulness": 5,
+            "clarity": 5,
             "hallucination": false,
             "overall": 4,
-            "comment": "Accurate and appropriately urgent, though it only hints at the founder/eponymous link rather than stating it outright, and the suggested action is somewhat generic."
+            "comment": "Accurate, clear and actionable on the founder's departure, though 'stepped down' implies a voluntary resignation the TM01 does not confirm."
           }
         },
         "sonnet": {
-          "briefing": "What happened: Alexander David Greensill ceased to be a registered director of Greensill Capital (UK) Ltd, effective 17 June 2026, as recorded in a TM01 filing on 25 June 2026",
+          "briefing": "Risk: Serious\nWhat happened: Alexander David Greensill has ceased to be a director of Greensill Capital (UK) Ltd, effective 17 June 2026, as recorded in a TM01 filing lodged 25 June 2026.\nWhy it matters: The departure of a director bearing the company's own name is a notable governance change that may signal shifts in control, strategy or ownership, and warrants closer scrutiny given the company's history and current standing.\nSuggested action: Review the company's latest confirmation statement and accounts, and check for any related filings (e.g. new appointments, registered office changes, or insolvency notices) before extending or renewing credit terms.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 2,
-            "action_usefulness": 1,
-            "assigned_severity": "Routine",
-            "severity_matches_expected": false,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
-            "overall": 2,
-            "comment": "Accurate but purely descriptive \u2014 it fails to flag that this is the founder's departure or suggest any follow-up, understating the seriousness."
+            "overall": 4,
+            "comment": "Accurate and clearly written, with sensible checks suggested, though it only implies rather than states the founder link and the vague nod to 'the company's history and current standing' adds no verifiable substance."
           }
         }
       }
@@ -567,29 +547,25 @@
       },
       "models": {
         "haiku": {
-          "briefing": "**What happened:**\nGreensill Capital (UK) Ltd entered formal administration on 22 March 2021, meaning an external administrator was appointed to manage the company's assets and liabilities.\n\n**Why it matters:**\nThis signals the company could not meet its obligations and creditors (including any you may have outstanding with them) are now at risk. Administration is a formal insolvency process where an administrator takes control, typically leading to asset sales or liquidation. Any outstanding invoices, deposits or contractual commitments with this company are unlikely to be recovered in full.\n\n**Suggested action:**\nCheck your exposure to this company immediately \u2014 verify any open invoices, prepayments or ongoing contracts \u2014 and contact the appointed administrator to register as a creditor in the insolvency process.",
+          "briefing": "Risk: Critical\n\nWhat happened: An administrator has been appointed to Greensill Capital (UK) Ltd, placing the company into administration with a view to liquidation.\n\nWhy it matters: This is an insolvency event \u2014 the company is being wound down under formal court supervision. Any outstanding contracts, credit lines, or trading relationships with this entity are now at severe risk and subject to administrator control. Creditors and counterparties typically recover only a proportion of amounts owed, if anything.\n\nSuggested action: If you have exposure to this company (outstanding invoices, deposits, guarantees, or active contracts), contact the appointed administrator immediately to register your claim and understand the process and timeline.",
           "scores": {
-            "factual_accuracy": 5,
-            "interpretation": 5,
-            "action_usefulness": 4,
-            "assigned_severity": "Critical",
-            "severity_matches_expected": true,
+            "factual_accuracy": 4,
+            "usefulness": 4,
+            "clarity": 5,
             "hallucination": false,
-            "overall": 5,
-            "comment": "Accurate, appropriately urgent summary of the administration appointment with sound creditor guidance, though it could have added explicit instruction to halt further credit or new business immediately."
+            "overall": 4,
+            "comment": "Accurate and clearly written summary of the administration appointment, though it asserts court supervision as a given and omits the explicit step of halting further credit."
           }
         },
         "sonnet": {
-          "briefing": "**What happened:** On 22 March 2021, Greensill Capital (UK) Ltd was placed into administration, with administrators formally appointed to take control of the company's affairs.\n\n**Why it matters:** This is a critical, formal insolvency event confirming the company is no longer trading normally and control has passed to insolvency practitioners; any outstanding payments, contracts, or supply arrangements with this entity are now at high risk and subject to the administration process rather than normal commercial terms.\n\n**Suggested action:** Immediately freeze any new credit or trading exposure to this entity, review and cease reliance on existing contracts or receivables with them, and contact the appointed administrators (via the Companies House filing or Gazette notice) to register any claims.",
+          "briefing": "Risk: Critical\n\nWhat happened: Greensill Capital (UK) Ltd has entered administration, with an administrator formally appointed to take control of the company's affairs.\n\nWhy it matters: This is a formal insolvency event indicating the company is unable to meet its obligations as they fall due; normal trading, payments, and contract performance can no longer be relied upon, and creditors' recoveries will depend on the administration process.\n\nSuggested action: Immediately suspend new credit or commitments to this entity, freeze any open exposures, and contact the appointed administrator to register your position as a creditor or counterparty.",
           "scores": {
             "factual_accuracy": 5,
-            "interpretation": 5,
-            "action_usefulness": 5,
-            "assigned_severity": "Critical",
-            "severity_matches_expected": true,
+            "usefulness": 5,
+            "clarity": 5,
             "hallucination": false,
             "overall": 5,
-            "comment": "Accurate, appropriately urgent summary of the administration appointment with concrete, well-targeted credit actions."
+            "comment": "Accurately reflects the administrator appointment with no invented details, and gives clear, directly actionable credit-team steps."
           }
         }
       }

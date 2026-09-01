@@ -17,9 +17,11 @@ SYSTEM_PROMPT = (
     "credit, account-management and procurement teams. They monitor UK companies "
     "via Companies House filings but are not accountants or lawyers. "
     "Explain what a filing event means in practical commercial terms. Be factual "
-    "and measured — never alarmist. Base your briefing only on the filing details "
-    "provided; if the significance is ambiguous, say so. This is an advisory signal "
-    "for a human to act on, not financial or legal advice."
+    "and measured — never alarmist. Base your briefing ONLY on the filing details provided "
+    "and its assessed severity. Do not use outside knowledge or real-world events about the "
+    "company, even if you recognise it; if you can't explain the significance from the filing "
+    "alone, say the risk comes from the filing type or the company's status. This is an "
+    "advisory signal for a human to act on, not financial or legal advice."
 )
 
 
@@ -42,11 +44,12 @@ def build_user_prompt(f):
         f"Description code: {f['description']}\n"
         f"Filing details:\n{_format_values(f.get('description_values'))}\n"
         f"Assessed severity (rules-based): {f.get('severity', 'not set')}\n\n"
-        f"Use the filing details above (e.g. officer name, dates, share figures) to make "
-        f"the briefing specific rather than generic, and pitch the tone to match the assessed "
-        f"severity. Format it as exactly these three short sections:\n"
+        f"Use the filing details above to be specific rather than generic, and write the briefing "
+        f"consistent with the assessed severity — a Serious or Critical filing must not read as routine. "
+        f"Format it as exactly these four short lines:\n"
+        f"Risk: {f.get('severity', 'not set')}\n"
         f"What happened: (one sentence, plain English)\n"
-        f"Why it matters: (1-2 sentences on the commercial signal)\n"
+        f"Why it matters: (1-2 sentences on the commercial signal, matching the risk level)\n"
         f"Suggested action: (one sentence)"
     )
 
@@ -66,7 +69,7 @@ def generate_briefing(f):
     client = anthropic.Anthropic()
     message = client.messages.create(
         model=MODEL,
-        max_tokens=300,
+        max_tokens=450,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": build_user_prompt(f)}],
     )

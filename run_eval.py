@@ -79,7 +79,7 @@ def load_filing(conn, tid):
 def make_briefing(f, model):
     msg = client.messages.create(
         model=model,
-        max_tokens=300,
+        max_tokens=450,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": build_user_prompt(f)}],
     )
@@ -88,43 +88,42 @@ def make_briefing(f, model):
 
 
 JUDGE_SYSTEM = (
-    "You are a strict, fair evaluator of commercial filing briefings written for credit and "
-    "risk teams. Score objectively against the analyst's ground truth. Reply with ONLY a JSON "
-    "object, no prose, no code fences."
+    "You are a strict, fair evaluator of the WRITING QUALITY of commercial filing briefings for "
+    "credit and risk teams. Judge only the prose: is it factually accurate to the filing, useful "
+    "and actionable, clear, and free of invented facts. Do NOT assign a severity or urgency — that "
+    "is decided by separate rules, not by you. Reply with ONLY a JSON object, no prose, no code fences."
 )
 
 
-def judge(f, expected_severity, key_facts, briefing_text):
+def judge(f, key_facts, briefing_text):
     prompt = (
         "FILING FACTS:\n"
         f"  company: {f['company_name']}\n"
         f"  date: {f['date']}   type: {f['type']}   description: {f['description']}\n"
         f"  values: {json.dumps(f['description_values'])}\n\n"
-        "GROUND TRUTH (from a human analyst):\n"
-        f"  expected_severity: {expected_severity}\n"
-        f"  key_facts: {key_facts}\n\n"
+        "KEY FACTS a good briefing must get right (from a human analyst):\n"
+        f"  {key_facts}\n\n"
         "BRIEFING TO SCORE:\n"
         f"{briefing_text}\n\n"
-        "Score the briefing on 1-5 scales (5 = best). 'severity_matches_expected' is whether the "
-        "briefing's implied urgency matches expected_severity. Return ONLY this JSON:\n"
-        '{"factual_accuracy":0,"interpretation":0,"action_usefulness":0,'
-        '"assigned_severity":"Routine|Watch|Serious|Critical",'
-        '"severity_matches_expected":true,"hallucination":false,"overall":0,'
-        '"comment":"one short sentence"}'
+        "Score the briefing's writing quality on 1-5 scales (5 = best). Do NOT assess urgency or "
+        "severity. Return ONLY this JSON, nothing else:\n"
+        '{"factual_accuracy":0,"usefulness":0,"clarity":0,"hallucination":false,'
+        '"overall":0,"comment":"one short sentence"}'
     )
-    msg = client.messages.create(
-        model=JUDGE,
-        max_tokens=350,
-        system=JUDGE_SYSTEM,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    add_cost(JUDGE, msg.usage)
-    text = extract_text(msg).strip()
-    start, end = text.find("{"), text.rfind("}")
-    try:
-        return json.loads(text[start:end + 1])
-    except Exception as e:
-        return {"error": f"could not parse judge output: {e}", "raw": text}
+    text = ""
+    for attempt in range(2):
+        msg = client.messages.create(
+            model=JUDGE, max_tokens=400, system=JUDGE_SYSTEM,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        add_cost(JUDGE, msg.usage)
+        text = extract_text(msg).strip()
+        start, end = text.find("{"), text.rfind("}")
+        try:
+            return json.loads(text[start:end + 1])
+        except Exception:
+            prompt += "\n\nYour last reply was not valid JSON. Return ONLY the JSON object, nothing before or after."
+    return {"error": "could not parse judge output after retry", "raw": text}
 
 
 def _avg(values):
@@ -136,26 +135,25 @@ def write_markdown(results):
     lines = ["# Phase 6 — Evaluation results\n"]
     lines.append(f"Test cases: {len(results)}  ·  Models: Haiku vs Sonnet  ·  Judge: Opus\n")
 
-    # --- Summary table ---
-    lines.append("## Summary (average judge scores)\n")
-    lines.append("| Model | Factual | Interpretation | Action | Overall | Severity match | Hallucinations |")
+    # --- Summary table (briefing writing quality; severity is scored separately by eval_verdict.py) ---
+    lines.append("## Summary (average briefing-quality scores)\n")
+    lines.append("| Model | Factual | Usefulness | Clarity | Overall | Hallucinations | Scored |")
     lines.append("|---|---|---|---|---|---|---|")
     for label in ("haiku", "sonnet"):
-        fa, interp, act, overall, matches, halluc, n = [], [], [], [], 0, 0, 0
+        fa, use, clar, overall, halluc, n = [], [], [], [], 0, 0
         for r in results:
             s = r["models"].get(label, {}).get("scores", {})
             if "error" in s:
                 continue
             n += 1
             fa.append(s.get("factual_accuracy"))
-            interp.append(s.get("interpretation"))
-            act.append(s.get("action_usefulness"))
+            use.append(s.get("usefulness"))
+            clar.append(s.get("clarity"))
             overall.append(s.get("overall"))
-            matches += 1 if s.get("severity_matches_expected") else 0
             halluc += 1 if s.get("hallucination") else 0
         lines.append(
-            f"| {label.capitalize()} | {_avg(fa)} | {_avg(interp)} | {_avg(act)} | "
-            f"{_avg(overall)} | {matches}/{n} | {halluc}/{n} |"
+            f"| {label.capitalize()} | {_avg(fa)} | {_avg(use)} | {_avg(clar)} | "
+            f"{_avg(overall)} | {halluc}/{n} | {n}/{len(results)} |"
         )
     lines.append("")
 
@@ -165,8 +163,8 @@ def write_markdown(results):
         f = r["filing"]
         case = r["case"]
         lines.append(f"### {i}. {f['company_name']} — {f['type']} ({f['date']})")
-        lines.append(f"*Expected severity:* **{case['expected_severity']}**  ")
-        lines.append(f"*Ground truth:* {case['key_facts']}\n")
+        lines.append(f"*Rules verdict:* **{f.get('severity','?')}**  ·  *Ground-truth severity:* {case['expected_severity']}  ")
+        lines.append(f"*Key facts:* {case['key_facts']}\n")
         for label in ("haiku", "sonnet"):
             m = r["models"].get(label, {})
             s = m.get("scores", {})
@@ -179,11 +177,8 @@ def write_markdown(results):
             else:
                 lines.append(
                     f"*Judge:* overall **{s.get('overall')}/5** · "
-                    f"factual {s.get('factual_accuracy')} · interp {s.get('interpretation')} · "
-                    f"action {s.get('action_usefulness')} · "
-                    f"assigned **{s.get('assigned_severity')}** "
-                    f"({'match' if s.get('severity_matches_expected') else 'MISMATCH'}) · "
-                    f"hallucination: {s.get('hallucination')}  \n"
+                    f"factual {s.get('factual_accuracy')} · usefulness {s.get('usefulness')} · "
+                    f"clarity {s.get('clarity')} · hallucination: {s.get('hallucination')}  \n"
                     f"> _{s.get('comment','')}_\n"
                 )
         lines.append("---\n")
@@ -209,7 +204,7 @@ def main():
         for label, model in (("haiku", HAIKU), ("sonnet", SONNET)):
             try:
                 text = make_briefing(f, model)
-                scores = judge(f, case["expected_severity"], case["key_facts"], text)
+                scores = judge(f, case["key_facts"], text)
             except Exception as e:
                 text, scores = f"(error: {e})", {"error": str(e)}
             entry["models"][label] = {"briefing": text, "scores": scores}

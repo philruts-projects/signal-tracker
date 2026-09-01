@@ -1,106 +1,67 @@
-# Phase 6 — Evaluation
+# Evaluation
 
-How well does the Signal Tracker turn a Companies House filing into a useful, correctly-calibrated
-commercial briefing? This evaluates the real product prompt against a curated set of real filings,
-scored by an independent model and calibrated against human judgement.
+The tool makes two kinds of output, so it gets two kinds of test. The **risk verdict**
+(Routine, Watch, Serious, Critical) is decided by deterministic rules, so it's checked
+deterministically against a human analyst's ground truth. The **briefing** is written by
+Claude, so its writing quality is judged separately. Keeping them apart matters: an earlier
+version scored the verdict by reading the briefing's tone, which was noisy and, worse, measured
+the wrong thing. The rules decide risk; the rules are what we hold to account.
 
-## Method
+Test set: 12 real filings (`eval/eval_set.csv`), spanning routine changes at healthy insurers
+through to Carillion and Greensill in the run-up to collapse. Ground truth (expected severity
+plus the key facts a briefing must get right) set by a commercial data leader.
 
-**Test set (12 real filings, `eval/eval_set.csv`).** Deliberately spanning the severity range and,
-crucially, built around the *run-up to failure* rather than the aftermath — because the value of the
-tool is early warning, not labelling a company that has already collapsed. The set mixes:
+## Eval 1 — the verdict (deterministic)
 
-- Routine filings at healthy insurers (director changes, interim accounts, confirmation statement, a share allotment).
-- Two contextual "watch" cases (a very large share cancellation; a repeated accounting-reference-date change).
-- Genuine pre-collapse warning signals from Carillion (CFO exit, CEO exit, a charge from the Oct-2017 cluster), Greensill (founder removed) and the actual Greensill administration.
+`eval_verdict.py` runs the rules over the test set and compares each verdict to ground truth.
+No model, no cost, same answer every run.
 
-**Ground truth** was set by a domain expert (commercial data leader): an expected severity
-(Routine / Watch / Serious / Critical) and the key facts a good briefing must get right.
+**Accuracy: 10/12.** Full detail in [verdict_results.md](verdict_results.md).
 
-**Models compared.** Every filing was briefed by **Claude Haiku 4.5** and **Claude Sonnet** using the
-identical production prompt.
+Every routine filing is called correctly, Aviva's large buyback lands at Watch, Greensill's
+founder departure and its administration are right, and the two pattern fixes hold: Carillion's
+charge reads Serious because the rules see it's one of a cluster of five in a week, and London
+Capital & Finance's accounting-date change reads Serious because the rules see it's the third in
+fifteen months. Pattern detection moved this from 9 to 10.
 
-**Scoring (hybrid).** **Claude Opus** acted as an independent LLM-as-judge, scoring each briefing 1–5 on
-factual accuracy, interpretation, and action usefulness, plus assigned severity, a severity-match flag,
-and a hallucination flag. The human expert then **spot-checked and confirmed** the judge's calls, so the
-automated scores are reported with human calibration behind them (mitigating the "AI grading AI" concern).
+The two misses are both Carillion director exits, the finance director and the CEO, which the
+rules call Routine. There is no fix for these in the data: Companies House holds no executive
+title and the officer `occupation` field is empty, so nothing in the record says one of these
+people ran the finances. It's a genuine ceiling, and it stays in the report as one.
 
-**Cost** was measured from real token usage. Full run: **$0.30** for 24 briefings + 24 judgements.
+## Eval 2 — the briefing (writing quality)
 
-## Headline results
+`run_eval.py` has Claude Haiku and Claude Sonnet each write a briefing for every test filing,
+then Opus scores the *writing* — factual accuracy, usefulness, clarity, and whether it invents
+anything — deliberately **not** severity, which Eval 1 owns. Scores and side-by-side briefings
+land in [results.md](results.md). Cost is about $0.30 a run.
 
-Average judge scores (over cases scored cleanly):
+What holds across runs: the briefings are factually accurate and don't hallucinate — the
+instruction to stick to the supplied filing works. Haiku and Sonnet come out close, so Haiku
+stays the default at a third of the cost. The one weakness the split exposed: a model would
+occasionally write a flat, purely descriptive briefing for a serious event (Sonnet did exactly
+this on the Greensill founder departure, stating the fact and stopping). The fix was to feed the
+rules verdict into the briefing and make it lead with an explicit "Risk:" line, so a Serious
+filing can't be written up as a shrug.
 
-| Model | Factual | Interpretation | Action | Overall | Severity match | Hallucinations |
-|---|---|---|---|---|---|---|
-| Haiku 4.5 | 4.5 | 3.5 | 3.4 | 3.5 | 7/10 | 0/10 |
-| Sonnet | 4.9 | 3.8 | 3.4 | 3.8 | 7/10 | 0/10 |
+Two honest limits of the harness: the Opus judge occasionally returned malformed JSON, now
+handled with a retry; and with 12 cases on a single run these numbers are directional, not
+statistically robust.
 
-## Key findings
+## What this says about the product
 
-**1. Strong at the extremes.** Routine filings were correctly kept calm (cases 1–4: both models factual,
-low-urgency, no false alarms), and the unambiguous crisis — Greensill entering administration — was handled
-excellently by both ("freeze new credit, submit claims via the administrator", 4–5/5). As a first-pass triage
-that separates noise from genuine crisis, the tool works.
+It's a reliable first-pass triage. Routine filings stay quiet, real crises get the right verdict
+and a sound, plainly-written action, and it doesn't fabricate. Its ceiling is knowledge the public
+record doesn't contain — a director's actual role — and its remaining risk is the same one every
+version has had: a single filing read alone can't see everything, which is why the charge-cluster
+and repeated-date-change patterns matter and why more of that work is the road ahead.
 
-**2. It systematically under-flags the early-warning signals — the highest-value cases.** All three severity
-mismatches are *under-calls* on pre-collapse signals:
+## Recommendations
 
-- Carillion's **finance director** departing (~1 year before collapse) → scored **Watch**, not Serious. Haiku didn't even register that Adam was the finance chief.
-- Carillion's **CEO** departing (~6 months before) → **Watch**, both models hedging on whether Howson was CEO.
-- LC&F's **third accounting-date change in 15 months** → dismissed by Haiku as "administrative housekeeping", Routine.
-
-**Root cause: single-filing context blindness.** Each briefing sees one filing in isolation, so it cannot
-know that Adam was the *finance* director, that this was the *third* date change, or that the charge was
-*one of five in a week*. From a one-filing view, "a director resigned" genuinely is routine. The model is
-not so much wrong as blind — and this is exactly the **pattern-detection gap**: real distress is a *cluster*
-of filings over time, and the current tool reads them one at a time.
-
-**3. Haiku is good enough; Sonnet's 3× cost buys no better risk calibration.** Sonnet is marginally more
-polished (factual 4.9 vs 4.5) but identical on severity matching (7/10), and on the Carillion charge it was
-actually *worse* — Sonnet called it Watch where Haiku correctly called it Serious. For this task the evidence
-supports the cheaper model.
-
-**4. Zero hallucinations across all 24 briefings.** The instruction to base briefings only on the supplied
-filing, and to flag ambiguity rather than invent, held completely.
-
-**5. Severity calibration is the weak spot, and it errs in the worst direction — under-calling risk.** A tool
-that misses a serious signal is more dangerous than one that over-flags a routine one.
-
-## Failure modes
-
-*Of the product:*
-
-- **No role context** — it can't tell a departing *finance director* from any other director.
-- **No history** — it can't see that a filing is the third of its kind (repeated accounting-date changes).
-- **No clustering** — it can't see that a charge is one of five filed the same week, or that three board
-  departures happened in six months. This is the single most important limitation.
-
-*Of the evaluation method (stated for honesty):*
-
-- The Opus judge returned unparseable JSON on **4 of 24** scoring calls (needs a retry / stricter parse).
-- Sonnet's briefings twice exceeded the 300-token output cap and were cut off mid-sentence (raise the cap for verbose models).
-- **n = 12, single run.** No repeated runs to measure variance; conclusions are directional, not statistically robust.
-- The judge is itself a model; human spot-check calibration mitigates but does not eliminate this.
-
-## Recommendations (roadmap)
-
-The evaluation points directly at the next build, most of it already in `BACKLOG.md`:
-
-1. **Give the model context so it can stop being blind.** Add the filing-type role/label, the company's
-   current status (active / in administration — from the company profile endpoint), and a window of the
-   company's recent filings. This alone would likely fix most under-calls.
-2. **Cluster/pattern detection** — the headline feature. Flag *sequences*: multiple board exits, repeated
-   date changes, bursts of charges. This is where the real early-warning value lives.
-3. **Encode the human heuristics** surfaced in review: always elevate a founder departure; elevate
-   finance-leadership churn; elevate charge clusters and repeated accounting-date changes; apply a
-   size threshold to capital events.
-4. **Keep Haiku** as the default model; revisit only if the task changes.
-5. **Harden the harness**: robust judge parsing with retry, higher output cap, and multiple runs for variance.
-
-## Bottom line
-
-The Signal Tracker is a reliable *first-pass triage*: it separates routine filings from genuine crises,
-gives sound, actionable briefings at both ends, and never fabricates. Its weakness is the valuable middle —
-the subtle, early warnings that only make sense across *several* filings — because it currently reads each
-filing alone. That is not a flaw to paper over; it is the clearly-evidenced case for the next phase of work.
+The rules layer earns most of the next investment, because it's where accuracy actually lives.
+Lift the thresholds and mappings out of code into an editable rules table so a domain expert tunes
+them directly. Keep widening the cross-filing patterns. Bring in the sources that add a
+*different* dimension rather than more of the same — the FCA register for regulatory status, the
+Gazette for the earliest formal notices — since the churn work taught us distress is a confluence,
+not any single signal. Keep Haiku. And re-run both evals after each change: the verdict eval is
+free and instant, so there's no excuse not to.
