@@ -63,6 +63,33 @@ estimates; make finished work visible; no preamble, no recap, no closing pleasan
 until Phil says "stop adhd mode". The "explain the jargon" and "stage the work" rules above still
 apply — when Phil asks to be walked through something, explain fully but keep the shape.
 
+## Model choice — recommend a switch, then ask
+
+Phil pays per model tier, so the cost of a session depends on which model is running it. At
+the start of every chat, and whenever the kind of work changes mid-chat, say which tier fits
+the next stretch of work and ask a yes/no question: *"This is build work; Sonnet would do it
+for less. Switch? (yes/no)"* or *"This is a planning call; worth a stronger model. Switch?
+(yes/no)"*. One line, then carry on with whatever he answers. Never switch silently and never
+nag — one recommendation per change of work type.
+
+**Cheaper tier (Sonnet) is the default** for build sessions: writing or editing scripts
+against a pattern that already exists in the repo, staged VS Code steps, reading tracebacks,
+paste and indentation fixes, doc updates, commits. `CLAUDE.md` and the primer carry the
+context, so the model doesn't need to be clever, it needs to be careful.
+
+**Stronger tier (Opus / Fable) for judgement moments**, which are rarer and shorter:
+- a planning session — choosing the next slice, deciding whether a data source earns its place
+- interpreting real data against the product's purpose (e.g. "is this early warning or
+  aftermath?"), where a weaker model tends to say "great, add it"
+- anything shaped like the external review: critique, finding what the code claims but
+  doesn't do
+- working out an undocumented API from thin evidence
+- the last read of a doc or post before it goes public
+
+The known failure mode of a cheaper model on this project isn't wrong code, it's
+over-building and cheerleading, which the priorities above exist to prevent. If a session
+on the cheaper tier starts adding layers nobody asked for, that's the signal to switch up.
+
 ## Tech stack
 
 - Python 3.12 in a conda environment named `signal-tracker`
@@ -85,6 +112,9 @@ python tracker.py
 # the dashboard — read-only over data/signals.db, makes no API calls
 streamlit run app.py
 
+# add a company to the watchlist by name (one free Companies House search call)
+python add_company.py "Marks and Spencer"
+
 # tests
 python tests/test_rules.py     # offline rule tests, stdlib only, no API key needed
 python eval_verdict.py         # deterministic verdict regression suite, no API key needed
@@ -93,7 +123,7 @@ python eval_verdict.py         # deterministic verdict regression suite, no API 
 python run_eval.py
 ```
 
-Other top-level scripts (`probe_charges.py`, `probe_officers.py`, `probe_fca.py`,
+Other top-level scripts (`probe_charges.py`, `probe_officers.py`, `probe_fca.py`, `probe_gazette.py`,
 `first_call.py`, `first_briefing.py`, `fetch_filings.py`, `simulate_new_filing.py`) are
 one-off exploration/scratch scripts used while building a feature, not part of the pipeline.
 
@@ -111,7 +141,8 @@ one-off exploration/scratch scripts used while building a feature, not part of t
 3. Fetch filing history and diff it against the `filings` table by `transaction_id` (the
    permanent Companies House key) to find genuinely new filings. A company's first-ever poll
    is stored as `baseline` history and never briefed.
-4. Each new filing gets a verdict from `severity.py`'s `combined_severity`: a single-filing
+4. Each new filing gets a verdict from `severity.py`'s `combined_severity` (thresholds are read
+   from `rules.csv` at import, so tuning is a data edit, not a code edit): a single-filing
    rule (`rule_severity` — insolvency, strike-off, charges, founder-departure terminations,
    ARD changes, capital events) escalated by a cross-filing pattern check
    (`pattern_severity` — charge clusters, repeated ARD changes). `pattern_severity` is
