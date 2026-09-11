@@ -18,10 +18,11 @@ users are credit analysts, account managers and procurement/supplier-risk teams 
 this monitoring by hand, if at all. The value proposition: "it watches the companies you're
 exposed to and tells you, in plain English, when one is heading for trouble in time to act."
 
-It's a portfolio project built by a commercial data leader (13 years, most recently Head of Data,
-Insight & Analytics at an InsurTech) who is moving into AI-enablement roles. He is not a
-professional software engineer. The goal is to demonstrate the pattern of: spot a real problem,
-build something end-to-end that solves it, and measure honestly whether it works.
+It's an early-stage commercial product built by a commercial data leader (13 years, most recently
+Head of Data, Insight & Analytics at an InsurTech), built to a commercial standard. He is not a
+professional software engineer. The approach: spot a real problem, build something end-to-end that
+solves it, measure honestly whether it works, and widen it one data source at a time on the bet
+that the value is in integrating sources.
 
 Repo: https://github.com/philruts-projects/signal-tracker
 

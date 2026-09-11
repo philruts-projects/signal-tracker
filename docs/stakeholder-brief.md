@@ -1,5 +1,11 @@
 # Stakeholder Brief — Companies House Signal Tracker
 
+> **Superseded (Sept 2026).** This brief was written under the earlier framing, when Signal
+> Tracker was a portfolio project aimed at three audiences at once. It is kept for provenance.
+> The current objective, target user and product shape live in
+> [`product-brief.md`](product-brief.md), and the plan for testing them in
+> [`discovery-plan.md`](discovery-plan.md).
+
 **Commissioned by:** Head of Commercial Risk (owns credit, key-account and supplier-risk exposure)
 **Prepared by:** Data & AI Enablement · **Date:** August 2026 · **Status:** Approved, in build
 
@@ -28,4 +34,4 @@ A tool that continuously monitors a defined watchlist of UK companies via the fr
 
 ## Constraints
 
-Free Companies House API. Briefings are advisory only and always cite the underlying filing. Single-user, portfolio-grade prototype — reliability, auth and multi-user concerns explicitly deferred.
+Free Companies House API. Briefings are advisory only and always cite the underlying filing. Early-stage product built to a commercial standard: currently single-user, with multi-user auth and scale deliberately staged rather than dismissed.

@@ -5,9 +5,18 @@ first working vertical slice (one company → one filing → one briefing) is ru
 
 ## North star
 
-The watchlist is the product. The briefing is the value. Everything else is
-enrichment. Any new data source must earn its place by making a briefing more
-*actionable* — not just by adding more data.
+Help a business identify customers or suppliers whose risk has materially changed,
+understand why, and decide where to act before the problem becomes obvious. The output is a
+prioritised review queue. Full statement in `docs/product-brief.md`.
+
+Any new data source or feature must earn its place by changing what a user *does*, not by
+adding more data. The test never changes: did this flag cause a better action, sooner?
+
+**Note (Sept 2026).** The project is in discovery, see `docs/discovery-plan.md`. Most of the
+enrichment listed below is parked until we know whether the public signals carry real early
+warning. One item has moved the other way: company observation history, long treated as a
+nice-to-have, is now the spine of the product, because "what changed since you last looked" is
+the core promise and the current code cannot deliver it.
 
 ## Data source enrichment — review after MVP
 

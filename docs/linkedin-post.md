@@ -1,23 +1,15 @@
 # LinkedIn post — draft
 
-I did something slightly masochistic with my latest project: I asked a different AI model to tear it apart.
+I built a thing, and I'd genuinely like you to try and break it.
 
-Some context. I've been building **Signal Tracker** — a tool that watches a list of UK companies on the free Companies House register and gives an early, plain-English warning when one looks like it's heading for trouble. It's the sort of thing credit, procurement and account-management teams do by hand today, if they get to it at all. For me it's a portfolio project: take a real commercial problem, build something end to end that solves it, and — the part I care about most — measure honestly whether it works.
+It's called Signal Tracker. It watches a list of UK companies on the free Companies House register and warns you, in plain English, when one of them looks like it might be heading for trouble. The people who'd use it, in credit or procurement or key-account teams, do this by hand today when they get to it at all, even though the warning signs usually sit in the public filings for months before anyone acts. Nobody's watching them, so I built something that does.
 
-So instead of polishing the demo, I wrote a detailed brief and asked an independent model to review the whole thing as a sceptical credit-risk expert. No encouragement. Just: *where is this weak?*
+Two ideas do the heavy lifting. First, the rules decide and the AI only explains: deterministic logic sets the risk verdict so it stays auditable, and the Claude API is kept to writing the plain-English briefing, which is the thing language models are actually good at. Second, it treats distress as a pattern rather than a single event. One director leaving is noise; a finance chief walking out and then, a few weeks later, a cluster of new charges as the company scrambles for secured cash, that's a signal, and you only catch it by reading across the filings instead of one at a time.
 
-It found real things.
+The part I'm most pleased with isn't a feature. It's the evaluation. It scores the tool against companies that actually went under, Carillion and Greensill among them, and it writes down where it falls short instead of hiding it. At one point I handed the whole thing to a different AI model and told it to review my work as a sceptical expert. It found real weaknesses. Fixing those in the open turned out to be half the story.
 
-→ My dashboard ranked companies by their registered status but quietly ignored the filing-level signals underneath — so a freshly-detected serious event could sit on a company still showing green.
+It's early, and still narrow. I'm adding one data source at a time, because the interesting bit is what happens when you combine them: something that no single register tells you on its own.
 
-→ Failed API calls were being treated as "no news" — which, for a risk tool, means a company can look healthiest exactly when you can't actually see it.
+Code's on GitHub: https://github.com/philruts-projects/signal-tracker
 
-→ And my headline "accuracy" number was really a regression check wearing a performance claim's clothes.
-
-None of that was fun to read. All of it was right.
-
-So I fixed them, one commit at a time — and the fixes, not the original build, are the part I'm now proudest of. Serious filings drive the headline. Missing data reads as "Unknown," never "fine." The evaluation runs from committed fixtures anyone can reproduce, with the look-ahead leak closed.
-
-The wider lesson I'm taking into AI-enablement work: the highest-value way to use these models often isn't to *generate* — it's to *critique*. An honest adversarial review is cheap, fast, and worth more than another feature.
-
-Happy to share the write-up if it's useful to anyone building in this space.
+Have a poke around, run it, tell me where it's wrong, or take the idea and build your own. I'd like to hear from anyone working in credit, risk, data or AI.

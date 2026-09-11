@@ -9,10 +9,12 @@ flags how much attention each company needs, and writes a plain-English briefing
 built for the credit, account-management and supplier-risk teams who do this by hand today,
 when they do it at all.
 
-It's also a portfolio project: the point was to take a real commercial problem, build
-something end to end that solves it, and then measure honestly whether it works. The
-[evaluation](eval/EVALUATION.md) is the part I'm most pleased with, including where it
-comes up short.
+It's built as a commercial product, not a demo: take a real commercial problem, solve it
+end to end, and — the part that matters most — measure honestly whether it works. The
+[evaluation](eval/EVALUATION.md) is the part I'm most pleased with, including where it comes
+up short. It's deliberately early and still narrow, built to a commercial standard and
+widened one data source at a time, on the bet that the value is in integrating sources
+rather than any single one.
 
 ## What it does
 
@@ -107,6 +109,6 @@ where the value is.
 
 ## About
 
-Built by Phil Rutter, a commercial data leader moving into AI enablement. Companies House data
+Built by Phil Rutter, a commercial data leader. Companies House data
 is Crown copyright, used under the [Open Government Licence](https://www.nationalarchives.gov.uk/doc/open-government-licence/).
 Briefings are advisory and always cite the underlying filing; this is not financial or legal advice.

@@ -13,6 +13,8 @@ Run it with:  streamlit run app.py
 
 import json
 import sqlite3
+from datetime import datetime, timezone
+
 import pandas as pd
 import streamlit as st
 
@@ -96,6 +98,26 @@ def cluster_summaries(mine):
     return out
 
 
+def last_polled_label(companies):
+    """Human-readable 'when did tracker.py last run', from the newest last_polled timestamp."""
+    if "last_polled" not in companies or companies["last_polled"].dropna().empty:
+        return "Last polled: never — run tracker.py to fetch data."
+    latest = max(datetime.fromisoformat(v) for v in companies["last_polled"].dropna())
+    if latest.tzinfo is None:
+        latest = latest.replace(tzinfo=timezone.utc)
+    age = datetime.now(timezone.utc) - latest
+    minutes = int(age.total_seconds() // 60)
+    if minutes < 1:
+        ago = "just now"
+    elif minutes < 60:
+        ago = f"{minutes} minute(s) ago"
+    elif minutes < 60 * 24:
+        ago = f"{minutes // 60} hour(s) ago"
+    else:
+        ago = f"{minutes // (60 * 24)} day(s) ago"
+    return f"Last polled: {latest.strftime('%Y-%m-%d %H:%M UTC')} ({ago})"
+
+
 companies, filings = load_data()
 
 # --- Per-company risk posture -------------------------------------------------
@@ -147,6 +169,7 @@ data_issues = int((posture["risk"] == "Unknown").sum())
 st.title("🛡️ Signal Tracker")
 st.caption("A review queue for the companies you're exposed to — public filings, triaged and explained in plain English. "
            "Risk here is a review priority, not a probability of failure.")
+st.caption(last_polled_label(companies))
 
 c1, c2, c3 = st.columns(3)
 c1.metric("Companies watched", len(posture))
