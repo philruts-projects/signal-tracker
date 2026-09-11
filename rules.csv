@@ -1,6 +1,6 @@
-   rule,value,unit,note
-   capital_watch_threshold,500000000,GBP,Capital event at or above this figure is Watch; crude size cue pending a %-of-revenue rule
-   ard_changes_to_elevate,2,changes,Accounting-reference-date changes within the window (counting the current filing) that make it Serious
-   ard_window_months,18,months,Look-back window for repeated accounting-date changes
-   charge_cluster_count,3,charges,Registered charges within the window (counting the current one) that make it Serious
-   charge_cluster_days,30,days,Look-back window for the charge cluster
+rule,value,unit,note
+capital_watch_threshold,500000000,GBP,Capital event at or above this figure is Watch; crude size cue pending a %-of-revenue rule
+ard_changes_to_elevate,2,changes,Accounting-reference-date changes within the window (counting the current filing) that make it Serious
+ard_window_months,18,months,Look-back window for repeated accounting-date changes
+charge_cluster_count,3,charges,Registered charges within the window (counting the current one) that make it Serious
+charge_cluster_days,30,days,Look-back window for the charge cluster

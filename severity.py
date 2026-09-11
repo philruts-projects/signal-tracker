@@ -14,19 +14,28 @@ the remaining data ceiling.
 
 import re
 from datetime import datetime
+import csv
+from pathlib import Path
 
 _ORDER = {"Routine": 0, "Watch": 1, "Serious": 2, "Critical": 3}
 
-CAPITAL_WATCH_THRESHOLD = 500_000_000  # GBP; crude size cue pending a %-of-revenue rule
+   # Thresholds live in rules.csv, not here, so a domain expert can tune them without touching
+   # code. The RULE (what to look for) stays in this file; the LINE (where it bites) is data.
+RULES_FILE = Path(__file__).with_name("rules.csv")
 
-# Accounting-reference-date changes: how many changes within the window elevate to Serious.
-# This COUNTS THE CURRENT FILING, so a value of 2 means "the second change within the window".
-# (Deliberately the second, not the third: two ARD changes inside 18 months is already unusual.)
-ARD_CHANGES_TO_ELEVATE = 2
-ARD_WINDOW_MONTHS = 18
 
-CHARGE_CLUSTER_COUNT = 3      # charges within the window (incl. this one) that elevate to Serious
-CHARGE_CLUSTER_DAYS = 30      # look-back window for the cluster, in days
+def load_rules(path=RULES_FILE):
+       """Read rules.csv into {rule_name: number}. Fails loudly if the file is missing."""
+       with open(path, newline="") as f:
+           return {row["rule"]: int(row["value"]) for row in csv.DictReader(f)}
+
+
+RULES = load_rules()
+CAPITAL_WATCH_THRESHOLD = RULES["capital_watch_threshold"]   # GBP
+ARD_CHANGES_TO_ELEVATE = RULES["ard_changes_to_elevate"]     # counts the current filing
+ARD_WINDOW_MONTHS = RULES["ard_window_months"]
+CHARGE_CLUSTER_COUNT = RULES["charge_cluster_count"]         # counts the current filing
+CHARGE_CLUSTER_DAYS = RULES["charge_cluster_days"]
 
 
 def _date(value):
