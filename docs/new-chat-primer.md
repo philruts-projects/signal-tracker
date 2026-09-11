@@ -7,7 +7,7 @@ Paste everything below the line into a fresh chat to start clean and aligned.
 We're continuing my Signal Tracker project. Before anything else:
 
 1. Read `CLAUDE.md` (project purpose, priorities, how I work, architecture).
-2. Read `BACKLOG.md` and `eval/EVALUATION.md` to get current.
+2. Read `BACKLOG.md`, `eval/EVALUATION.md`, `docs/review-response.md` (an external review and what it fixed) and `docs/signal-tracker-data-sources.md` (research on candidate data sources) to get current.
 3. Turn on the ADHD output style in `skills/i-have-adhd/SKILL.md` and keep it on for the whole chat — lead with the next action, number multi-step work, restate where we are each turn, give specific time estimates, no preamble or closing pleasantries.
 
 **Priorities, in order:** (1) my learning and skill development, (2) staying engaged and enjoying it, (3) a working product — which may never ship. When a call is fuzzy, pick what teaches more and keeps momentum. Don't over-build or gold-plate. Build the smallest useful thing, look at the real data, then decide. I'm a commercial data leader, not a software engineer, so explain jargon and stage the work so I can do each step myself in VS Code.
