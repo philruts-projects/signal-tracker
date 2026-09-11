@@ -51,6 +51,15 @@ def run():
     check("Unknown with no signals stays Unknown",
           s.portfolio_company_risk(None, profile_ok=False)[0] == "Unknown")
 
+    # --- Gazette notice overrides everything to Critical -----------------------
+    notice = {"date": "2018-01-19", "title": "Winding-Up Orders", "notice_code": "2452"}
+    check("a Gazette notice overrides an otherwise-healthy status to Critical",
+          s.portfolio_company_risk("active", gazette_notice=notice)[0] == "Critical")
+    check("a Gazette notice's reason names the notice",
+          "Winding-Up Orders" in s.portfolio_company_risk("active", gazette_notice=notice)[1])
+    check("no Gazette notice leaves the status-based risk alone",
+          s.portfolio_company_risk("active", gazette_notice=None)[0] == "Routine")
+
     # --- Accounting-reference-date threshold (explicit: the SECOND change) -----
     def ard(date):  # a minimal AA01 filing dict
         return {"date": date, "type": "AA01", "category": "", "description": "change-account-reference-date"}

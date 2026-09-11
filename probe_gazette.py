@@ -1,16 +1,10 @@
 """
 probe_gazette.py — does The Gazette warn earlier than Companies House?
 
-Same idea as probe_charges.py / probe_officers.py / probe_fca.py: call the endpoint once,
-print what comes back, decide with our own eyes whether it's worth storing.
-
-The Gazette is the UK's official public record. Insolvency practitioners must publish
-notices there (administrator appointed, winding-up petition, etc), often before the
-matching form reaches Companies House. Category 24 = "Corporate Insolvency".
-
-No key, no registration: the notice feed is open data. Every notice quotes the company
-number in its text, so we search on the number, not the name (see BACKLOG.md: always key
-on number).
+Same idea as probe_charges.py / probe_officers.py / probe_fca.py: call the endpoint,
+print what comes back, decide with our own eyes whether it's worth storing. The actual
+fetch lives in gazette.py, shared with tracker.py — this script is now just the
+"look at it and compare dates" harness.
 
 Run it:
   python probe_gazette.py            # every company in watchlist.csv
@@ -18,11 +12,6 @@ Run it:
 
 Read-only. Makes no Companies House or Claude calls. If data/signals.db exists it reads
 (never writes) the earliest insolvency filing per company so you can compare dates.
-
-Lessons learned getting this to run (all real, all in one afternoon):
-  - the Gazette answers the default "python-requests" User-Agent with HTTP 403
-  - adding an "Accept: application/json" header alongside data.json gives HTTP 500
-  - some queries take well over 20 seconds; it's a free service with no SLA
 """
 
 import csv
@@ -34,35 +23,9 @@ from pathlib import Path
 
 import requests
 
-BASE = "https://www.thegazette.co.uk/all-notices/notice/data.json"
-CORPORATE_INSOLVENCY = "24"
+from gazette import fetch_notices
+
 DB = Path("data/signals.db")
-
-# Identify ourselves the way a browser would. Companies House never cared; this one does.
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/128.0 Safari/537.36"
-    ),
-}
-TIMEOUT_SECONDS = 60
-
-
-def gazette_notices(company_number):
-    """All corporate-insolvency notices mentioning this company number, oldest first."""
-    params = {
-        "text": company_number,
-        "categorycode": CORPORATE_INSOLVENCY,
-        "sort-by": "oldest-date",
-        "results-page-size": 50,
-    }
-    response = requests.get(BASE, params=params, headers=HEADERS, timeout=TIMEOUT_SECONDS)
-    print(f"GET {response.url}  ->  HTTP {response.status_code}")
-    response.raise_for_status()
-    payload = response.json()
-    # The feed is Atom XML re-expressed as JSON, so field names carry their "f:" prefix
-    # and a single result still arrives as a one-item list. No matches = no "entry" key.
-    return payload.get("entry") or []
 
 
 def first_ch_insolvency_filing(company_number):
@@ -89,10 +52,8 @@ def main():
     for number in numbers:
         print(f"\n=============== {number} ===============")
         try:
-            notices = gazette_notices(number)
+            notices = fetch_notices(number)
         except requests.RequestException as e:
-            # Same lesson as the tracker's Unknown state: a failed fetch is "don't know",
-            # not "no notices". Say so and move on to the next company.
             print(f"Gazette: request failed ({type(e).__name__}) - skipped, NOT clean.")
             continue
 

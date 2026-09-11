@@ -24,6 +24,7 @@ from briefing import generate_briefing
 from severity import combined_severity
 from officers import compute_churn
 from charges import summarize_charges
+from gazette import fetch_notices, earliest_notice
 
 load_dotenv()
 API_KEY = os.getenv("CH_API_KEY")
@@ -74,6 +75,11 @@ def setup_database():
             profile_ok             INTEGER DEFAULT 1,
             officers_ok            INTEGER DEFAULT 1,
             charges_ok             INTEGER DEFAULT 1,
+            gazette_ok             INTEGER DEFAULT 1,
+            gazette_notice_date    TEXT,
+            gazette_notice_code    TEXT,
+            gazette_notice_title   TEXT,
+            gazette_notice_url     TEXT,
             last_polled            TEXT
         )
     """)
@@ -96,7 +102,10 @@ def setup_database():
     # Idempotent migrations so an existing DB gains the new columns without a rebuild.
     _add_columns(conn, "companies", {
         "profile_ok": "INTEGER DEFAULT 1", "officers_ok": "INTEGER DEFAULT 1",
-        "charges_ok": "INTEGER DEFAULT 1", "last_polled": "TEXT"})
+        "charges_ok": "INTEGER DEFAULT 1", "last_polled": "TEXT",
+        "gazette_ok": "INTEGER DEFAULT 1", "gazette_notice_date": "TEXT",
+        "gazette_notice_code": "TEXT", "gazette_notice_title": "TEXT",
+        "gazette_notice_url": "TEXT"})
     _add_columns(conn, "filings", {
         "briefing_status": "TEXT", "briefing_attempts": "INTEGER DEFAULT 0"})
     # Backfill briefing_status for rows that predate the column: anything already briefed is
@@ -152,6 +161,17 @@ def process_company(conn, company):
         ch = {"charges_total": 0, "charges_outstanding": 0, "charges_recent": 0, "charges_rows": []}
         charges_ok = 0
 
+    # The Gazette: does a formal insolvency notice exist for this company? A different
+    # API (no key, different auth), so it gets its own try/except and its own *_ok flag,
+    # same pattern as profile/officers/charges above. See gazette.py for what we learned
+    # probing this endpoint (4-14 day lead over Companies House, formal-event only).
+    gazette_ok = 1
+    gazette = None
+    try:
+        gazette = earliest_notice(fetch_notices(number))
+    except Exception:
+        gazette_ok = 0
+
     now = datetime.now(timezone.utc).isoformat()
     conn.execute(
         """INSERT OR REPLACE INTO companies
@@ -159,13 +179,19 @@ def process_company(conn, company):
             has_insolvency_history, has_charges, accounts_overdue,
             peak_churn, peak_churn_date, recent_churn, short_tenure_exits,
             charges_total, charges_outstanding, charges_recent, charges_json,
-            profile_ok, officers_ok, charges_ok, last_polled)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            profile_ok, officers_ok, charges_ok,
+            gazette_ok, gazette_notice_date, gazette_notice_code,
+            gazette_notice_title, gazette_notice_url, last_polled)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (number, name, status, status_detail, has_insolvency, has_charges, accounts_overdue,
          churn["peak_churn"], churn["peak_churn_date"], churn["recent_churn"],
          churn["short_tenure_exits"],
          ch["charges_total"], ch["charges_outstanding"], ch["charges_recent"],
-         json.dumps(ch["charges_rows"]), profile_ok, officers_ok, charges_ok, now),
+         json.dumps(ch["charges_rows"]), profile_ok, officers_ok, charges_ok,
+         gazette_ok, gazette["date"] if gazette else None,
+         gazette["notice_code"] if gazette else None,
+         gazette["title"] if gazette else None,
+         gazette["url"] if gazette else None, now),
     )
 
     already_stored = conn.execute(

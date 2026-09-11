@@ -194,16 +194,29 @@ def company_risk(status, has_insolvency_history=False, accounts_overdue=False, r
 
 def portfolio_company_risk(status, has_insolvency_history=False, accounts_overdue=False,
                            recent_churn=0, watch_signals=0, serious_signals=0, critical_signals=0,
-                           profile_ok=True):
+                           profile_ok=True, gazette_notice=None):
     """Company REVIEW PRIORITY: the status-based risk, escalated by the company's own
     filing-level signals so a freshly-detected Serious filing can't leave the headline at
     Routine (the central workflow bug the external review flagged).
 
-    Returns (level, reason) where reason explains any filing-driven escalation ('' if the
-    status-based risk already dominates). This is a review-priority heuristic, NOT a
-    probability of insolvency.
+    `gazette_notice`, if given, is a small dict {'date', 'title', 'notice_code'} describing
+    a formal Gazette corporate-insolvency notice for this company (see gazette.py). Its mere
+    existence outranks everything else here: an insolvency practitioner or a court has
+    already taken formal action, which is a stronger fact than any status field or filing
+    pattern this tool can infer. It's the ONE thing allowed to set Critical on its own,
+    because unlike the filing-based rules it isn't an inference — see BACKLOG.md for what
+    probing this source found (4-14 day lead over Companies House, formal-event only).
+
+    Returns (level, reason) where reason explains any escalation ('' if the status-based
+    risk already dominates). This is a review-priority heuristic, NOT a probability of
+    insolvency.
     """
     base = company_risk(status, has_insolvency_history, accounts_overdue, recent_churn, profile_ok)
+
+    if gazette_notice:
+        title = gazette_notice.get("title") or "insolvency notice"
+        when = gazette_notice.get("date") or "unknown date"
+        return "Critical", f"Gazette: {title} ({when})"
 
     # Only Serious/Critical filing signals raise a company's REVIEW PRIORITY. Watch signals
     # (a lone new charge, a large buyback, an accounting-date change) are shown on the card and

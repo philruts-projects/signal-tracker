@@ -128,12 +128,24 @@ for _, co in companies.iterrows():
     ser = int((mine["severity"] == "Serious").sum())
     crit = int((mine["severity"] == "Critical").sum())
 
+    # A Gazette notice (see gazette.py) is a small dict or None — None covers both "no
+    # notice" and "the fetch failed", same as officers_ok/charges_ok elsewhere in this file:
+    # a quiet miss, not a headline Unknown. Worth revisiting if that ever proves too quiet.
+    gazette_notice = None
+    if co.get("gazette_notice_date"):
+        gazette_notice = {
+            "date": co.get("gazette_notice_date"),
+            "title": co.get("gazette_notice_title"),
+            "notice_code": co.get("gazette_notice_code"),
+        }
+
     # Review priority: status-based risk escalated by THIS company's own filing signals,
-    # so a Serious filing can't leave the headline at Routine.
+    # so a Serious filing can't leave the headline at Routine. A Gazette notice overrides
+    # everything to Critical (see severity.py).
     risk, reason = portfolio_company_risk(
         co.get("status"), co.get("has_insolvency_history"), co.get("accounts_overdue"),
         co.get("recent_churn"), watch_signals=watch, serious_signals=ser, critical_signals=crit,
-        profile_ok=as_bool(co.get("profile_ok")),
+        profile_ok=as_bool(co.get("profile_ok")), gazette_notice=gazette_notice,
     )
 
     notable = mine[mine["severity"].isin(["Watch", "Serious", "Critical"])]
@@ -156,6 +168,8 @@ for _, co in companies.iterrows():
         "short_tenure_exits": int(co.get("short_tenure_exits") or 0),
         "charges_outstanding": int(co.get("charges_outstanding") or 0),
         "charges_rows": json.loads(co["charges_json"]) if co.get("charges_json") else [],
+        "gazette_url": co.get("gazette_notice_url"),
+        "gazette_ok": as_bool(co.get("gazette_ok")),
     })
 
 posture = pd.DataFrame(rows)
@@ -197,9 +211,18 @@ for _, co in view.iterrows():
             bits.append(f"{co['crit']} critical / {co['ser']} serious signals on record")
         st.markdown("  ·  ".join(bits))
         if co["reason"]:
-            st.caption(f"⬆️ {co['reason']}")
+            icon = "📰" if co["reason"].startswith("Gazette:") else "⬆️"
+            st.caption(f"{icon} {co['reason']}")
+            if co["reason"].startswith("Gazette:") and co["gazette_url"]:
+                st.caption(f"[View the notice]({co['gazette_url']})")
         if co["risk"] == "Unknown":
             st.caption("⚪ Data unavailable — the last fetch for this company failed, so its status is not known.")
+        if not co["gazette_ok"]:
+            # A silent Gazette failure would look identical to "no notices found" — the same
+            # trap Finding 2 caught for profile/officers/charges. Flagged, not escalated: it
+            # doesn't touch risk, because a stale Gazette check says nothing either way about
+            # the status-based risk this card is already showing.
+            st.caption("⚪ Gazette check unavailable last poll — a notice could exist and not show here yet.")
         if co["latest"]:
             st.caption(f"Latest signal: {co['latest']}")
 
