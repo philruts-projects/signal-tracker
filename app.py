@@ -132,7 +132,7 @@ for _, co in companies.iterrows():
     # notice" and "the fetch failed", same as officers_ok/charges_ok elsewhere in this file:
     # a quiet miss, not a headline Unknown. Worth revisiting if that ever proves too quiet.
     gazette_notice = None
-    if co.get("gazette_notice_date"):
+    if pd.notna(co.get("gazette_notice_date")):
         gazette_notice = {
             "date": co.get("gazette_notice_date"),
             "title": co.get("gazette_notice_title"),
@@ -213,7 +213,7 @@ for _, co in view.iterrows():
         if co["reason"]:
             icon = "📰" if co["reason"].startswith("Gazette:") else "⬆️"
             st.caption(f"{icon} {co['reason']}")
-            if co["reason"].startswith("Gazette:") and co["gazette_url"]:
+            if co["reason"].startswith("Gazette:") and pd.notna(co["gazette_url"]):
                 st.caption(f"[View the notice]({co['gazette_url']})")
         if co["risk"] == "Unknown":
             st.caption("⚪ Data unavailable — the last fetch for this company failed, so its status is not known.")
