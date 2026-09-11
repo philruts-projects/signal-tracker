@@ -23,7 +23,7 @@ the core promise and the current code cannot deliver it.
 | Source | Signal it adds | Cost | Notes |
 |---|---|---|---|
 | Companies House **Streaming API** | Real-time filings (no polling) | Free | Same data, better plumbing. Natural Phase 3+ upgrade. |
-| **The Gazette** (thegazette.co.uk) | Insolvency, administration, strike-off | Free API | Strongest distress-signal set. |
+| **The Gazette** (thegazette.co.uk) | Insolvency, administration, strike-off | Free, no key | **Probed 11 Sep 2026** (`probe_gazette.py`): notice feed searched by company number, category 24. Beat Companies House on all three collapse cases: Carillion 4 days, LC&F 14, Greensill 10. Zero notices on the 7 healthy companies. But every first notice *is* the formal event (administrator appointed / winding-up order), so it's a faster Critical, not an earlier Watch. Worth adding as the one source that can set Critical on its own; watch for winding-up petitions (code 2450) as the only run-up signal it might carry. Quirks: default python User-Agent gets 403; an Accept header gets 500; queries can exceed 20s. |
 | **FCA Financial Services Register** | Regulatory authorisation status | Free | Relevant if watchlist is financial firms. |
 | **Registry Trust** (CCJs) | County court judgments | Paid | Classic credit-risk signal. |
 | Credit agencies (Creditsafe, Experian, D&B) | Commercial-grade risk scores | Paid | The "what incumbents charge for" comparison. |
